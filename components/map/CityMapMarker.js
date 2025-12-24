@@ -3,80 +3,112 @@
 
 import { motion, useTransform } from "framer-motion";
 import { useMemo } from "react";
-import { useMapState } from "./MapCanvas"; // Import the hook to get scale
+import { useMapState } from "./MapCanvas";
+
+// --- Predefined Map Structures (Clean, Isometric-ish, Professional) ---
+const Structures = {
+    Dome: (color) => (
+        <svg viewBox="0 0 24 24" className="w-16 h-16 fill-current drop-shadow-sm" style={{ color }}>
+            {/* Simple Clean Semi-Circle Dome */}
+            <path d="M2,18 L22,18 L22,20 L2,20 Z" fillOpacity="0.8" /> {/* Base */}
+            <path d="M12,4 C17,4 21,12 21,18 L3,18 C3,12 7,4 12,4 Z" fillOpacity="0.9" /> {/* Dome */}
+            <path d="M12,4 C14,4 15,10 15,18 L9,18 C9,10 10,4 12,4 Z" fill="white" fillOpacity="0.2" /> {/* Shine/Highlight */}
+        </svg>
+    ),
+    Tent: (color) => (
+        <svg viewBox="0 0 24 24" className="w-16 h-16 fill-current drop-shadow-sm" style={{ color }}>
+            {/* Clean Event Tent */}
+            <path d="M12,3 L2,15 L2,20 L22,20 L22,15 L12,3 Z" fillOpacity="0.9" />
+            <path d="M12,3 L12,20" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" /> {/* Center Pole line */}
+            <path d="M12,3 L7,15 L17,15 L12,3 Z" fill="white" fillOpacity="0.2" /> {/* Front Face */}
+        </svg>
+    ),
+    Stage: (color) => (
+        <svg viewBox="0 0 24 24" className="w-20 h-14 fill-current drop-shadow-sm" style={{ color }}>
+            {/* Rectangular Stage Structure */}
+            <rect x="2" y="10" width="20" height="8" rx="1" fillOpacity="0.9" />
+            <path d="M4,10 L8,5 L16,5 L20,10" fillOpacity="0.6" /> {/* Roof/Truss */}
+            <rect x="6" y="12" width="12" height="4" fill="white" fillOpacity="0.2" /> {/* Screen/Area */}
+        </svg>
+    ),
+    Building: (color) => (
+        <svg viewBox="0 0 24 24" className="w-12 h-16 fill-current drop-shadow-sm" style={{ color }}>
+            {/* Minimalist Tower */}
+            <path d="M6,22 L18,22 L18,6 L6,6 L6,22 Z" fillOpacity="0.9" />
+            <path d="M6,6 L12,2 L18,6" fillOpacity="0.7" /> {/* Roof */}
+            <rect x="8" y="9" width="3" height="3" fill="white" fillOpacity="0.4" />
+            <rect x="13" y="9" width="3" height="3" fill="white" fillOpacity="0.4" />
+            <rect x="8" y="14" width="3" height="3" fill="white" fillOpacity="0.4" />
+            <rect x="13" y="14" width="3" height="3" fill="white" fillOpacity="0.4" />
+        </svg>
+    )
+};
 
 export default function CityMapMarker({ event, isSelected, onClick }) {
-    const { position, title, color, category, status } = event;
+    const { position, title, color, category, icon, iconType } = event;
     const { scale } = useMapState();
 
-    // Verify scale exists, default to 1 if not (e.g. if rendered outside context)
-    // Motion value transform: as map scale increases (zoom in), marker scale decreases relatively
-    // We want the marker to stay ROUGHLY the same physical size on screen, or at least not get tiny.
-    // So we scale the marker by 1 / mapScale.
-    // However, we might want to clamp it so it doesn't get HUGE when zoomed way out.
-    // Let's settle on a "Scale Factor" that boosts it when zoomed out.
+    const markerScale = useTransform(scale, s => Math.max(1 / s, 1));
 
-    // Logic: 
-    // At scale 0.6 (zoomed out): we want marker to be scale ~1.6 (so 0.6 * 1.6 ~= 1)
-    // At scale 2.0 (zoomed in): we want marker to be scale ~0.8 (so they don't cover everything)
-
-    const markerScale = useTransform(scale, s => {
-        // Base size logic: 
-        // If s < 0.8 (zoomed out), return 1 / s (keep constant size)
-        // If s > 1 (zoomed in), return 1 / s (keep constant size but let it get slightly smaller to show precision) or just 1?
-        // User wants: "while zoomed out the icons pills should be enlarged"
-        const inverse = 1 / s;
-        return Math.max(inverse, 1); // Never get smaller than 1x relative to map coordinate space? 
-        // Actually, if we just use inverse, it stays constant screen size.
-        // Let's try pure inverse for "Constant Screen Size" feel.
-    });
-
-    // Map category to short label
-    const shortLabel = useMemo(() => {
-        if (!category) return "Event";
-        if (category.includes("Food")) return "Food";
-        if (category.includes("Wellness")) return "Zen";
-        if (category.includes("Art")) return "Art";
-        if (category.includes("Performance")) return "Live";
-        return category.slice(0, 4);
+    // Choose structure based on category
+    const StructureIcon = useMemo(() => {
+        if (!category) return Structures.Building;
+        if (category.includes("Performance")) return Structures.Stage;
+        if (category.includes("Wellness")) return Structures.Dome;
+        if (category.includes("Food")) return Structures.Tent;
+        if (category.includes("Art")) return Structures.Dome;
+        return Structures.Building;
     }, [category]);
 
     return (
         <motion.div
-            className="absolute -translate-x-1/2 -translate-y-full cursor-pointer group"
+            className="absolute -translate-x-1/2 -translate-y-full cursor-pointer group flex flex-col items-center justify-end"
             style={{
                 left: `${position.x}%`,
                 top: `${position.y}%`,
-                scale: markerScale, // Apply the dynamic scale
-                originY: 1 // Scale from bottom so pin point stays in place
+                scale: markerScale,
+                originY: 1,
+                zIndex: isSelected ? 100 : 10
             }}
             onClick={onClick}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            whileHover={{ scale: 1.2, zIndex: 50 }} // Hover override (might conflict with style scale, but motion handles it nicely usually)
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            // whileHover={{ scale: 1.1, zIndex: 110 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
         >
-            {/* The Speech Bubble */}
-            <div className={`
-                relative px-3 py-2 bg-white rounded-2xl shadow-lg border border-gray-100/50 flex flex-col items-center justify-center min-w-[60px]
-                ${isSelected ? 'ring-2 ring-black z-20' : ''}
-            `}>
-                <span className="text-sm font-bold text-gray-900">{shortLabel}</span>
-                {status && (
-                    <span className="text-[9px] text-gray-400 uppercase tracking-tighter">{status}</span>
-                )}
+            {/* 1. The Label Pill - Floats ABOVE the structure (no overlap) */}
+            <motion.div
+                className={`
+                    relative mb-1 px-3 py-1.5 bg-white rounded-lg shadow-lg border border-gray-200 
+                    flex items-center gap-2 min-w-max transition-all
+                    ${isSelected ? 'ring-2 ring-black scale-105' : 'opacity-95'}
+                `}
+                // Initial float animation
+                initial={{ y: 5 }}
+                animate={{ y: 0 }}
+            >
+                {/* Icon */}
+                <span className="text-sm leading-none" role="img" aria-label="icon">
+                    {iconType === 'emoji' ? icon : '📍'}
+                </span>
 
-                {/* The little pointer/triangle at the bottom */}
-                <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white rotate-45" />
+                {/* Title - No truncate, let it fit naturally */}
+                <span className="text-[10px] font-bold text-gray-800 font-sans tracking-wide uppercase">
+                    {title}
+                </span>
+
+                {/* Little pointer triangle pointing down to structure */}
+                <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white rotate-45 border-b border-r border-gray-200" />
+            </motion.div>
+
+            {/* 2. The Structure (Visual Base) - Fully Visible */}
+            <div className="relative filter drop-shadow-md opacity-100 transition-transform group-hover:scale-105">
+                {/* Render the specific structure graphic */}
+                {StructureIcon(color || '#666')}
             </div>
 
-            {/* The Dot on the map */}
-            <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 flex items-center justify-center">
-                <div
-                    className="w-3 h-3 rounded-full border-2 border-white shadow-sm"
-                    style={{ backgroundColor: isSelected ? 'black' : (color || '#4ECDC4') }}
-                />
-            </div>
+            {/* 3. Shadow/Anchor on the ground */}
+            <div className="absolute -bottom-1 w-8 h-2 bg-black/15 rounded-[100%] blur-[2px] z-0" />
 
         </motion.div>
     );

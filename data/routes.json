@@ -1,26 +1,18 @@
 [
     {
+        "from": "art-installation",
+        "to": "food-court"
+    },
+    {
+        "from": "food-court",
+        "to": "main-stage"
+    },
+    {
         "from": "main-stage",
         "to": "meditation-dome"
     },
     {
-        "from": "main-stage",
-        "to": "drone-show"
-    },
-    {
-        "from": "main-stage",
-        "to": "food-court"
-    },
-    {
-        "from": "main-stage",
-        "to": "art-installation"
-    },
-    {
         "from": "meditation-dome",
-        "to": "art-installation"
-    },
-    {
-        "from": "food-court",
-        "to": "art-installation"
+        "to": "drone-show"
     }
 ]

@@ -8,8 +8,8 @@
     "iconType": "emoji",
     "color": "#C4A574",
     "position": {
-      "x": 50,
-      "y": 25
+      "x": 20,
+      "y": 30
     },
     "banner": "https://images.unsplash.com/photo-1533174072545-e8d4aa97edf9?q=80&w=1000&auto=format&fit=crop",
     "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
@@ -25,8 +25,8 @@
     "iconType": "emoji",
     "color": "#C4A574",
     "position": {
-      "x": 70,
-      "y": 75
+      "x": 40,
+      "y": 60
     },
     "banner": "https://images.unsplash.com/photo-1533174072545-e8d4aa97edf9?q=80&w=1000&auto=format&fit=crop",
     "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
@@ -59,8 +59,8 @@
     "iconType": "emoji",
     "color": "#4ECDC4",
     "position": {
-      "x": 75,
-      "y": 40
+      "x": 40,
+      "y": 30
     },
     "banner": "https://images.unsplash.com/photo-1593811167562-9cef47bfc4d7?q=80&w=1000&auto=format&fit=crop",
     "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",

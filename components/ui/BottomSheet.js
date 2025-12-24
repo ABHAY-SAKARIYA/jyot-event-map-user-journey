@@ -79,7 +79,7 @@ export default function BottomSheet({ event, isOpen, onClose, audioControl }) {
                             <div className="flex-1 bg-[#121212] text-[#e0e0e0] px-6 py-6 space-y-8 min-h-[500px]">
 
                                 {/* Ratings & Meta */}
-                                <div className="flex items-center justify-between border-b border-white/10 pb-6">
+                                {/* <div className="flex items-center justify-between border-b border-white/10 pb-6">
                                     <div className="flex items-baseline gap-1">
                                         <h3 className="text-2xl font-serif text-white">4.9</h3>
                                         <div className="flex text-[#d4a056]">
@@ -96,7 +96,7 @@ export default function BottomSheet({ event, isOpen, onClose, audioControl }) {
                                             <div key={i} className="w-8 h-8 rounded-full border-2 border-[#121212] bg-neutral-700" />
                                         ))}
                                     </div>
-                                </div>
+                                </div> */}
 
                                 {/* Description */}
                                 <div className="space-y-4">
@@ -134,7 +134,7 @@ export default function BottomSheet({ event, isOpen, onClose, audioControl }) {
                                 </div>
 
                                 {/* Upcoming Sessions */}
-                                <div className="space-y-4">
+                                {/* <div className="space-y-4">
                                     <div className="flex justify-between items-end">
                                         <h4 className="text-xl font-serif text-white">Upcoming Sessions</h4>
                                         <button className="text-[#d4a056] text-sm hover:underline">View All</button>
@@ -144,7 +144,7 @@ export default function BottomSheet({ event, isOpen, onClose, audioControl }) {
                                         <SessionCard time="3:00 PM" title="Silence & Self" author="Muni Shri Ji" />
                                         <SessionCard time="5:30 PM" title="Karma Theory" author="Dr. Shah" />
                                     </div>
-                                </div>
+                                </div> */}
 
                                 <div className="h-12" />
                             </div>

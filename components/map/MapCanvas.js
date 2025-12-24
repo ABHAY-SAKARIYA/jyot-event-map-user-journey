@@ -7,12 +7,12 @@ import { cn } from "@/lib/utils";
 import { useState, useEffect, createContext, useContext } from "react";
 
 // Create Context to share map state (like scale) with children markers
-const MapContext = createContext({ scale: 1 });
+const MapContext = createContext({ scale: 1, zoomIn: () => { }, zoomOut: () => { } });
 
 export const useMapState = () => useContext(MapContext);
 
-export default function MapCanvas({ children, className }) {
-    const { x, y, scale, containerRef } = useMapGestures();
+export default function MapCanvas({ children, className, controls }) {
+    const { x, y, scale, containerRef, zoomIn, zoomOut } = useMapGestures();
     const [constraints, setConstraints] = useState({ left: -1000, right: 1000, top: -1000, bottom: 1000 });
 
     // We need to pass the REAL numeric scale value to children, not just the motion value
@@ -42,7 +42,7 @@ export default function MapCanvas({ children, className }) {
     }, []);
 
     return (
-        <MapContext.Provider value={{ scale }}>
+        <MapContext.Provider value={{ scale, zoomIn, zoomOut }}>
             <div
                 ref={containerRef}
                 className={cn("relative w-full h-screen overflow-hidden bg-white cursor-grab active:cursor-grabbing", className)}
@@ -61,6 +61,9 @@ export default function MapCanvas({ children, className }) {
                         {children}
                     </div>
                 </motion.div>
+
+                {/* Fixed Overlay Controls (Zoom etc) */}
+                {controls}
             </div>
         </MapContext.Provider>
     );

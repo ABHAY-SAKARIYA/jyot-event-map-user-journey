@@ -1,5 +1,49 @@
 
+import { mapConfig } from "@/data/mapConfig";
+
 export default function CityMapBackground() {
+    const { city, ground } = mapConfig;
+
+    // Calculate Ground centering
+    const x = (100 - ground.width) / 2;
+    const y = (100 - ground.height) / 2;
+
+    // Helper to parse radius: number or string "tl tr br bl"
+    const getRadii = (r) => {
+        if (typeof r === 'number') return [r, r, r, r];
+        if (typeof r === 'string') {
+            const parts = r.split(' ').map(s => parseFloat(s));
+            if (parts.length === 1 && !isNaN(parts[0])) return [parts[0], parts[0], parts[0], parts[0]];
+            // Support 4 values: TL TR BR BL
+            if (parts.length === 4 && !parts.some(isNaN)) return parts;
+        }
+        return [0, 0, 0, 0];
+    };
+
+    const [tl, tr, br, bl] = getRadii(ground.cornerRadius);
+
+    // Generate Path Data for Rounded Rect with individual corners
+    const w = ground.width;
+    const h = ground.height;
+
+    // Path drawing logic (clockwise from top-left)
+    // Start at top edge, after top-left radius
+    // Line to top-right corner start
+    // Curve to right edge
+    // ...
+    const d = [
+        `M ${x + tl} ${y}`,
+        `L ${x + w - tr} ${y}`,
+        `Q ${x + w} ${y} ${x + w} ${y + tr}`,
+        `L ${x + w} ${y + h - br}`,
+        `Q ${x + w} ${y + h} ${x + w - br} ${y + h}`,
+        `L ${x + bl} ${y + h}`,
+        `Q ${x} ${y + h} ${x} ${y + h - bl}`,
+        `L ${x} ${y + tl}`,
+        `Q ${x} ${y} ${x + tl} ${y}`,
+        `Z`
+    ].join(" ");
+
     return (
         <div className="absolute inset-0 w-full h-full pointer-events-none bg-[#f4f7f6]">
             <svg
@@ -8,12 +52,36 @@ export default function CityMapBackground() {
                 className="w-full h-full"
             >
                 <defs>
-                    {/* Continuous City Grid Pattern */}
-                    <pattern id="street-grid" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+                    {/* Shadow Filter for Ground */}
+                    <filter id="ground-shadow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur in="SourceAlpha" stdDeviation="1" result="blur" />
+                        <feOffset in="blur" dx="0" dy="1" result="offsetBlur" />
+                        <feFlood floodColor="#000000" floodOpacity="0.1" result="colorBlur" />
+                        <feComposite in="colorBlur" in2="offsetBlur" operator="in" />
+                        <feMerge>
+                            <feMergeNode />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+
+                    {/* Continuous City Grid Pattern (Configurable) */}
+                    <pattern
+                        id="street-grid"
+                        x="0"
+                        y="0"
+                        width={city.gridSize}
+                        height={city.gridSize}
+                        patternUnits="userSpaceOnUse"
+                    >
                         {/* Main Block */}
-                        <rect width="10" height="10" fill="none" />
+                        <rect width={city.gridSize} height={city.gridSize} fill="none" />
                         {/* Streets */}
-                        <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#e0e6ed" strokeWidth="0.5" />
+                        <path
+                            d={`M ${city.gridSize} 0 L 0 0 0 ${city.gridSize}`}
+                            fill="none"
+                            stroke={city.streetColor}
+                            strokeWidth={city.strokeWidth}
+                        />
                     </pattern>
                 </defs>
 
@@ -21,37 +89,32 @@ export default function CityMapBackground() {
                 <rect x="0" y="0" width="100" height="100" fill="url(#street-grid)" />
 
                 {/* 2. Major Roads (Thicker Lines across the whole map) */}
-                {/* Vertical Avenues */}
-                <line x1="20" y1="0" x2="20" y2="100" stroke="white" strokeWidth="1.5" />
-                <line x1="50" y1="0" x2="50" y2="100" stroke="white" strokeWidth="1.5" />
-                <line x1="80" y1="0" x2="80" y2="100" stroke="white" strokeWidth="1.5" />
-                {/* Horizontal Streets */}
-                <line x1="0" y1="30" x2="100" y2="30" stroke="white" strokeWidth="1.5" />
-                <line x1="0" y1="70" x2="100" y2="70" stroke="white" strokeWidth="1.5" />
+                <line x1="33" y1="0" x2="33" y2="100" stroke="white" strokeWidth="1.5" />
+                <line x1="66" y1="0" x2="66" y2="100" stroke="white" strokeWidth="1.5" />
+                <line x1="0" y1="50" x2="100" y2="50" stroke="white" strokeWidth="1.5" />
 
 
-                {/* 3. The "Ground" / Park Feature - Embedded IN the city */}
-                {/* A large rounded rect area in the center-ish, sitting on top of the grid but below markers */}
-                <g filter="url(#shadow)">
+                {/* 3. The "Ground" / Park Feature */}
+                <g filter="url(#ground-shadow)">
                     <path
-                        d="M 25 25 H 75 Q 85 25 85 35 V 75 Q 85 85 75 85 H 25 Q 15 85 15 75 V 35 Q 15 25 25 25 Z"
-                        fill="#eef5f2"  /* Very subtle green-ish off-white for park/ground feel */
-                        stroke="#dcece5"
-                        strokeWidth="1"
+                        d={d}
+                        fill={ground.color}
+                        stroke={ground.borderColor}
+                        strokeWidth={ground.borderWidth}
                     />
                 </g>
 
-                {/* 4. Details within the Ground to show it's a specific zone */}
-                <circle cx="50" cy="55" r="12" fill="#dcece5" opacity="0.4" /> {/* Central Plaza area */}
+                {/* 4. Details within the Ground */}
+                <circle cx="50" cy="50" r="2" fill={ground.borderColor} opacity="0.3" />
 
-                {/* 5. A river or water feature running THROUGH the city (optional, nice touch) */}
+                {/* 5. Water feature */}
                 <path
-                    d="M 85 0 Q 80 20 90 40 T 85 100"
+                    d="M 90 0 Q 85 20 95 40 T 90 100"
                     fill="none"
                     stroke="#dbeef9"
-                    strokeWidth="4"
+                    strokeWidth="3"
                     strokeLinecap="round"
-                    opacity="0.6"
+                    opacity="0.5"
                 />
 
             </svg>

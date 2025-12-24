@@ -40,12 +40,12 @@ export default function Home() {
       </div>
 
       {/* UI Overlay */}
-      <div className="absolute top-0 left-0 p-6 z-10 pointer-events-none">
+      {/* <div className="absolute top-0 left-0 p-6 z-10 pointer-events-none">
         <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-neutral-800 to-neutral-500 dark:from-white dark:to-neutral-400 drop-shadow-sm">
           EventMap
         </h1>
         <p className="text-neutral-500 font-medium">Interactive Festival Guide</p>
-      </div>
+      </div> */}
 
       {/* Details Sheet / Panel */}
       <BottomSheet

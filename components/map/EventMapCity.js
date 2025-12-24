@@ -2,12 +2,41 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import MapCanvas from "./MapCanvas";
+import MapCanvas, { useMapState } from "./MapCanvas";
 import CityMapBackground from "./CityMapBackground";
 import CityMapMarker from "./CityMapMarker";
 import AnimatedPath from "./AnimatedPath";
 import { useEventData } from "@/hooks/useEventData";
 import { motion } from "framer-motion";
+
+// Helper component to access Map Context
+function ZoomControls() {
+    const { zoomIn, zoomOut } = useMapState();
+
+    return (
+        <div className="absolute bottom-24 right-4 flex flex-col gap-2 pointer-events-auto z-50">
+            <button
+                onClick={zoomIn}
+                className="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-700 hover:bg-gray-50 active:scale-95 transition-all border border-gray-100"
+                aria-label="Zoom In"
+            >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+            </button>
+            <button
+                onClick={zoomOut}
+                className="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-700 hover:bg-gray-50 active:scale-95 transition-all border border-gray-100"
+                aria-label="Zoom Out"
+            >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+            </button>
+        </div>
+    );
+}
 
 export default function EventMapCity({ onEventSelect }) {
     const { events, routes } = useEventData();
@@ -21,7 +50,7 @@ export default function EventMapCity({ onEventSelect }) {
         }
     };
 
-    // Calculate City-Style Paths (Manhattan/Elbow Routing)
+    // Calculate City-Style Paths
     const calculatedPaths = useMemo(() => {
         if (!routes || !events) return [];
 
@@ -34,31 +63,19 @@ export default function EventMapCity({ onEventSelect }) {
             const p1 = start.position;
             const p2 = end.position;
 
-            // Create an "L" shape or "Step" shape path to look like streets
-            // If horizontal distance > vertical, move horizontal first, then vertical
-            // To make it look like a specific "Route" we can just do simple Elbow:
-            // Move X then Move Y
+            const midX = p2.x;
+            const midY = p1.y;
 
-            const midX = p2.x; // Move all the way to target X
-            const midY = p1.y; // Stay at start Y
-
-            // Path: Start -> Corner -> End
-            // Adding a small radius at the corner for smoothness?
-            // Simple L-shape:
             return `M ${p1.x} ${p1.y} L ${midX} ${midY} L ${p2.x} ${p2.y}`;
-
-            // Alternative: Midpoint Stepped (Z-shape)
-            // const midX = (p1.x + p2.x) / 2;
-            // return `M ${p1.x} ${p1.y} L ${midX} ${p1.y} L ${midX} ${p2.y} L ${p2.x} ${p2.y}`;
         }).filter(Boolean);
     }, [events, routes]);
 
     return (
-        <MapCanvas>
+        <MapCanvas controls={<ZoomControls />}>
             <CityMapBackground />
 
-            {/* Roads Animation - now using Elbow paths */}
-            <div className="opacity-60"> {/* Slightly fainter paths to blend with city */}
+            {/* Roads Animation */}
+            <div className="opacity-60">
                 <AnimatedPath
                     paths={calculatedPaths}
                 />
@@ -95,6 +112,35 @@ export default function EventMapCity({ onEventSelect }) {
                     <div className="absolute -top-4 whitespace-nowrap bg-black text-white text-[8px] px-1 rounded font-bold">YOU</div>
                 </div>
             </motion.div>
+
+            {/* Zoom Controls Overlay - Rendered AFTER MapCanvas content? No context won't be available outside. 
+                Wait, MapCanvas renders children INSIDE the motion div which moves.
+                Use controls INSIDE MapCanvas?
+                Actually Context is available to children. But if we put absolute div here inside MapCanvas children, it will SCALE with the map content!
+                
+                FIX: MapCanvas needs to render "Overlay" slots or we need to put the controls INSIDE MapCanvas but outside the Scaled Content.
+                The current MapCanvas implementation:
+                <MapContext.Provider>
+                  <div className="relative w-full h-full ... overflow-hidden">
+                     <motion.div ...scale...>
+                       {children}   <-- This is where we are now.
+                     </motion.div>
+                  </div>
+                </MapContext.Provider>
+
+                If we render ZoomControls here as a child, it will be inside the motion.div and will move/scale.
+                
+                Correction: We must modify MapCanvas logic or pass a "Controls" prop?
+                Or simpler: Place ZoomControls as a sibling of MapCanvas? But then it can't access Context provided BY MapCanvas.
+
+                Solution: Modify MapCanvas to accept a `controls` prop or render children slightly differently?
+                OR: Just accept that for now, I need to modify MapCanvas to render {children} inside the scaled area, but maybe allow an "Overlay" child?
+                
+                Alternate Solution: Move the Context Provider OUTSIDE the MapCanvas inner structure?
+                No, MapCanvas *is* the provider.
+                
+                Let's Modify MapCanvas to properly support fixed overlays.
+            */}
 
         </MapCanvas>
     );
