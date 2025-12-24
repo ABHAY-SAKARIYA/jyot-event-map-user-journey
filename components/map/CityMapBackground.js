@@ -27,10 +27,6 @@ export default function CityMapBackground() {
     const h = ground.height;
 
     // Path drawing logic (clockwise from top-left)
-    // Start at top edge, after top-left radius
-    // Line to top-right corner start
-    // Curve to right edge
-    // ...
     const d = [
         `M ${x + tl} ${y}`,
         `L ${x + w - tr} ${y}`,
@@ -52,17 +48,8 @@ export default function CityMapBackground() {
                 className="w-full h-full"
             >
                 <defs>
-                    {/* Shadow Filter for Ground */}
-                    <filter id="ground-shadow" x="-20%" y="-20%" width="140%" height="140%">
-                        <feGaussianBlur in="SourceAlpha" stdDeviation="1" result="blur" />
-                        <feOffset in="blur" dx="0" dy="1" result="offsetBlur" />
-                        <feFlood floodColor="#000000" floodOpacity="0.1" result="colorBlur" />
-                        <feComposite in="colorBlur" in2="offsetBlur" operator="in" />
-                        <feMerge>
-                            <feMergeNode />
-                            <feMergeNode in="SourceGraphic" />
-                        </feMerge>
-                    </filter>
+                    {/* Shadow Filter REMOVED for mobile performance */}
+                    {/* Replaced with simple fake shadow shape below */}
 
                     {/* Continuous City Grid Pattern (Configurable) */}
                     <pattern
@@ -89,20 +76,30 @@ export default function CityMapBackground() {
                 <rect x="0" y="0" width="100" height="100" fill="url(#street-grid)" />
 
                 {/* 2. Major Roads (Thicker Lines across the whole map) */}
+                {/* We draw these at fixed 1/3 and 2/3 positions or customizable? Keeping fixed for now as "Main Artery" */}
+                {/* Note: Can be optimized to simple paths if needed, but lines are cheap */}
                 <line x1="33" y1="0" x2="33" y2="100" stroke="white" strokeWidth="1.5" />
                 <line x1="66" y1="0" x2="66" y2="100" stroke="white" strokeWidth="1.5" />
                 <line x1="0" y1="50" x2="100" y2="50" stroke="white" strokeWidth="1.5" />
 
 
                 {/* 3. The "Ground" / Park Feature */}
-                <g filter="url(#ground-shadow)">
-                    <path
-                        d={d}
-                        fill={ground.color}
-                        stroke={ground.borderColor}
-                        strokeWidth={ground.borderWidth}
-                    />
-                </g>
+                {/* Fake Shadow using a duplicated path underneath - Cheap Performance */}
+                <path
+                    d={d}
+                    transform="translate(0, 1)" // Simple offset
+                    fill="#000000"
+                    opacity="0.05"
+                    stroke="none"
+                />
+
+                {/* The Main Ground Shape */}
+                <path
+                    d={d}
+                    fill={ground.color}
+                    stroke={ground.borderColor}
+                    strokeWidth={ground.borderWidth}
+                />
 
                 {/* 4. Details within the Ground */}
                 <circle cx="50" cy="50" r="2" fill={ground.borderColor} opacity="0.3" />

@@ -11,13 +11,16 @@ import { motion } from "framer-motion";
 
 // Helper component to access Map Context
 function ZoomControls() {
-    const { zoomIn, zoomOut } = useMapState();
+    const { zoomIn, zoomOut, canZoomIn, canZoomOut } = useMapState();
 
     return (
         <div className="absolute bottom-24 right-4 flex flex-col gap-2 pointer-events-auto z-50">
             <button
                 onClick={zoomIn}
-                className="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-700 hover:bg-gray-50 active:scale-95 transition-all border border-gray-100"
+                disabled={!canZoomIn}
+                className={`w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-700 transition-all border border-gray-100
+                    ${!canZoomIn ? 'opacity-50 cursor-not-allowed blur-[0.5px]' : 'hover:bg-gray-50 active:scale-95'}
+                `}
                 aria-label="Zoom In"
             >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -27,7 +30,10 @@ function ZoomControls() {
             </button>
             <button
                 onClick={zoomOut}
-                className="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-700 hover:bg-gray-50 active:scale-95 transition-all border border-gray-100"
+                disabled={!canZoomOut}
+                className={`w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-700 transition-all border border-gray-100
+                    ${!canZoomOut ? 'opacity-50 cursor-not-allowed blur-[0.5px]' : 'hover:bg-gray-50 active:scale-95'}
+                `}
                 aria-label="Zoom Out"
             >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

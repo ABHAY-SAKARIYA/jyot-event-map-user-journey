@@ -45,37 +45,75 @@ export function useMapGestures() {
         return () => window.removeEventListener('resize', handleResize);
     }, [scale]);
 
+    // State to drive UI buttons (MotionValues don't trigger re-renders)
+    const [zoomState, setZoomState] = useState({ canZoomIn: true, canZoomOut: false });
+
+    useEffect(() => {
+        // Subscribe to scale changes to update UI state
+        const unsubscribe = scale.on("change", (latest) => {
+            // Define limits with small epsilon for float comparison
+            const isMin = latest <= minZoom + 0.01;
+            // Limit max zoom to 2 steps (approx 2.5x base)
+            const absoluteMax = minZoom * 2.5;
+            const isMax = latest >= absoluteMax - 0.01;
+
+            setZoomState({
+                canZoomIn: !isMax,
+                canZoomOut: !isMin
+            });
+        });
+        return unsubscribe;
+    }, [scale, minZoom]);
+
+    // Update Max Zoom dynamically? Or just soft limit in handler?
+    // We'll enforce soft limit in zoomIn/Out and wheel handler
+    const safeZoomIn = () => {
+        const absoluteMax = minZoom * 2.5;
+        // Step size: ~50% increment
+        const next = Math.min(scale.get() * 1.5, absoluteMax);
+        scale.set(next);
+    };
+
+    const safeZoomOut = () => {
+        // Step size: ~50% decrement
+        const next = Math.max(scale.get() / 1.5, minZoom);
+        scale.set(next);
+    };
+
     useEffect(() => {
         const container = containerRef.current;
         if (!container) return;
 
         const handleWheel = (e) => {
+            e.preventDefault();
+            const current = scale.get();
+            const absoluteMax = minZoom * 2.5;
+
+            let next;
             if (e.ctrlKey || e.metaKey) {
-                e.preventDefault();
-                const newScale = Math.min(Math.max(scale.get() - e.deltaY * 0.01, minZoom), MAX_ZOOM);
-                scale.set(newScale);
+                next = current - e.deltaY * 0.01;
             } else {
-                e.preventDefault();
-                const newScale = Math.min(Math.max(scale.get() - e.deltaY * 0.001, minZoom), MAX_ZOOM);
-                scale.set(newScale);
+                next = current - e.deltaY * 0.001;
             }
+
+            // Clamp
+            next = Math.min(Math.max(next, minZoom), absoluteMax);
+            scale.set(next);
         };
 
         container.addEventListener("wheel", handleWheel, { passive: false });
-        // Touch pinch-zoom logic would ideally go here too for full mobile support
-
         return () => container.removeEventListener("wheel", handleWheel);
     }, [scale, minZoom]);
 
     return {
         x,
         y,
-        scale: smoothScale, // Return the spring value for smooth rendering
-        rawScale: scale, // Return raw value if needed for calculations
+        scale: smoothScale,
+        rawScale: scale,
         containerRef,
         minZoom,
-        // Methods
-        zoomIn: () => scale.set(Math.min(scale.get() * 1.2, MAX_ZOOM)),
-        zoomOut: () => scale.set(Math.max(scale.get() / 1.2, minZoom))
+        ...zoomState, // Expose canZoomIn, canZoomOut
+        zoomIn: safeZoomIn,
+        zoomOut: safeZoomOut
     };
 }

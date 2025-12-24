@@ -157,26 +157,32 @@ export default function BottomSheet({ event, isOpen, onClose, audioControl }) {
 }
 
 function WaveformVisualizer({ isPlaying, audioProgress }) {
-    // Determine heights strictly based on render cycle or simple CSS animation to avoid random re-renders
-    // Using simple CSS keyframe animation for "playing" state would be best, but we are using inline styles.
-    // We'll use a deterministic random simulation based on index.
+    const bars = 20;
 
     return (
         <div className="flex-1 flex gap-[3px] items-center h-8">
-            {[...Array(20)].map((_, i) => (
-                <div
-                    key={i}
-                    className={cn(
-                        "w-1 bg-white/20 rounded-full transition-all duration-300"
-                    )}
-                    style={{
-                        // Use CSS variable or class for animation to keep render pure
-                        animation: isPlaying ? `waveform 1s infinite ease-in-out ${i * 0.1}s` : 'none',
-                        height: isPlaying ? '50%' : `${30 + (Math.sin(i) * 20)}%`, // Fallback height
-                        opacity: (i / 20) * (audioProgress / 100) > i / 20 ? 1 : 0.3
-                    }}
-                />
-            ))}
+            {[...Array(bars)].map((_, i) => {
+                // Progress calculation: Is this bar "filled"?
+                // i starts at 0. If progress is 50%, bars 0-9 should be filled.
+                // i / bars < progress / 100
+                const isFilled = (i / bars) < ((audioProgress || 0) / 100);
+
+                return (
+                    <div
+                        key={i}
+                        className={cn(
+                            "w-1 rounded-full transition-colors duration-300",
+                            isFilled ? "bg-[#d4a056]" : "bg-white/20"
+                        )}
+                        style={{
+                            // Animation only affects height
+                            // We use a CSS Class for animation to keep it performant
+                            animation: isPlaying ? `waveform 1s infinite ease-in-out ${i * 0.1}s` : 'none',
+                            height: isPlaying ? '50%' : `${30 + (Math.sin(i) * 20)}%`, // Fallback/Static height
+                        }}
+                    />
+                );
+            })}
             <style jsx>{`
                 @keyframes waveform {
                     0%, 100% { height: 20%; }

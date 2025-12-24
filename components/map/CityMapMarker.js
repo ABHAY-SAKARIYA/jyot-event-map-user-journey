@@ -102,13 +102,14 @@ export default function CityMapMarker({ event, isSelected, onClick }) {
             </motion.div>
 
             {/* 2. The Structure (Visual Base) - Fully Visible */}
-            <div className="relative filter drop-shadow-md opacity-100 transition-transform group-hover:scale-105">
+            {/* Removed drop-shadow-md for performance */}
+            <div className="relative opacity-100 transition-transform group-hover:scale-105">
                 {/* Render the specific structure graphic */}
                 {StructureIcon(color || '#666')}
             </div>
 
-            {/* 3. Shadow/Anchor on the ground */}
-            <div className="absolute -bottom-1 w-8 h-2 bg-black/15 rounded-[100%] blur-[2px] z-0" />
+            {/* 3. Shadow/Anchor on the ground - Removed Blur for performance */}
+            <div className="absolute -bottom-1 w-8 h-2 bg-black/10 rounded-[100%] z-0" />
 
         </motion.div>
     );
