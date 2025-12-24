@@ -1,0 +1,70 @@
+[
+  {
+    "id": "main-stage",
+    "title": "Main Stage",
+    "category": "Performance",
+    "description": "Experience the main performances of the festival. Join us for an unforgettable journey through sound and light, where ancient wisdom meets modern mindfulness practices.",
+    "icon": "🎭",
+    "iconType": "emoji",
+    "color": "#C4A574",
+    "position": {
+      "x": 50,
+      "y": 25
+    },
+    "banner": "https://images.unsplash.com/photo-1533174072545-e8d4aa97edf9?q=80&w=1000&auto=format&fit=crop",
+    "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+    "location": "Central Zone, Main Pavilion",
+    "status": "Open Now"
+  },
+  {
+    "id": "food-court",
+    "title": "Global Flavors",
+    "category": "Food & Drink",
+    "description": "A culinary journey around the world. Taste dishes from over 20 different cultures prepared by top chefs.",
+    "icon": "🍔",
+    "iconType": "emoji",
+    "color": "#FF6B6B",
+    "position": {
+      "x": 20,
+      "y": 60
+    },
+    "banner": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1000&auto=format&fit=crop",
+    "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+    "location": "West Wing",
+    "status": "Open Now"
+  },
+  {
+    "id": "meditation-dome",
+    "title": "Zen Dome",
+    "category": "Wellness",
+    "description": "Find your inner peace in our sound-proof meditation dome. Guided sessions every hour.",
+    "icon": "🧘",
+    "iconType": "emoji",
+    "color": "#4ECDC4",
+    "position": {
+      "x": 75,
+      "y": 40
+    },
+    "banner": "https://images.unsplash.com/photo-1593811167562-9cef47bfc4d7?q=80&w=1000&auto=format&fit=crop",
+    "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+    "location": "East Garden",
+    "status": "Sessions Available"
+  },
+  {
+    "id": "art-installation",
+    "title": "Neon Dreams",
+    "category": "Art",
+    "description": "Interactive light installation that responds to movement and sound.",
+    "icon": "🎨",
+    "iconType": "emoji",
+    "color": "#A66CFF",
+    "position": {
+      "x": 35,
+      "y": 80
+    },
+    "banner": "https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=1000&auto=format&fit=crop",
+    "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+    "location": "South Plaza",
+    "status": "Interactive"
+  }
+]
