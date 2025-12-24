@@ -5,6 +5,10 @@
     },
     {
         "from": "main-stage",
+        "to": "drone-show"
+    },
+    {
+        "from": "main-stage",
         "to": "food-court"
     },
     {

@@ -1,56 +1,81 @@
+
 "use client";
 
 import { useMotionValue, useSpring } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
-const MIN_ZOOM = 1; // Was 0.5 - prevent zooming out too much to avoid "empty space"
-const MAX_ZOOM = 4; // Allow deeper zoom for details
+// Default fallbacks
+const DEFAULT_MIN_ZOOM = 0.6;
+const MAX_ZOOM = 4;
 
 export function useMapGestures() {
     const x = useMotionValue(0);
     const y = useMotionValue(0);
-    const scale = useMotionValue(1.5); // Start zoomed in for immersion
+    const scale = useMotionValue(0.6); // Default to desktop scale initially to avoid hydration mismatch if possible, or handle via effect
 
-    // Smooth spring physics for natural feel
-    const smoothX = useSpring(x, { damping: 20, stiffness: 100 });
-    const smoothY = useSpring(y, { damping: 20, stiffness: 100 });
+    // We need state to track the "dynamic" min zoom based on device
+    const [minZoom, setMinZoom] = useState(DEFAULT_MIN_ZOOM);
+
     const smoothScale = useSpring(scale, { damping: 20, stiffness: 150 });
-
     const containerRef = useRef(null);
+
+    useEffect(() => {
+        // Responsive Logic
+        const handleResize = () => {
+            const isMobile = window.innerWidth < 768;
+            const targetBaseScale = isMobile ? 0.8 : 0.6;
+
+            // Set the minimum zoom limit
+            setMinZoom(targetBaseScale);
+
+            // Access raw value to check if we should reset/init
+            // If scale is at default 1 (or 0.6 previous default), snap to new base
+            // Or just verify we are within bounds
+            const currentScale = scale.get();
+            if (currentScale < targetBaseScale) {
+                scale.set(targetBaseScale);
+            }
+        };
+
+        // Run once on mount
+        handleResize();
+        // And on resize
+        window.addEventListener('resize', handleResize);
+
+        return () => window.removeEventListener('resize', handleResize);
+    }, [scale]);
 
     useEffect(() => {
         const container = containerRef.current;
         if (!container) return;
 
         const handleWheel = (e) => {
-            if (e.ctrlKey || e.metaKey) { // Pinch gesture often sends Ctrl+Wheel
+            if (e.ctrlKey || e.metaKey) {
                 e.preventDefault();
-                const newScale = Math.min(Math.max(scale.get() - e.deltaY * 0.01, MIN_ZOOM), MAX_ZOOM);
+                const newScale = Math.min(Math.max(scale.get() - e.deltaY * 0.01, minZoom), MAX_ZOOM);
                 scale.set(newScale);
             } else {
-                // Standard wheel to pan if we want, or just scroll to zoom? 
-                // Prompt says: "Zoom in/out (pinch & scroll)"
                 e.preventDefault();
-                const newScale = Math.min(Math.max(scale.get() - e.deltaY * 0.001, MIN_ZOOM), MAX_ZOOM);
+                const newScale = Math.min(Math.max(scale.get() - e.deltaY * 0.001, minZoom), MAX_ZOOM);
                 scale.set(newScale);
             }
         };
 
         container.addEventListener("wheel", handleWheel, { passive: false });
+        // Touch pinch-zoom logic would ideally go here too for full mobile support
+
         return () => container.removeEventListener("wheel", handleWheel);
-    }, [scale]);
+    }, [scale, minZoom]);
 
     return {
-        x: smoothX,
-        y: smoothY,
-        scale: smoothScale,
+        x,
+        y,
+        scale: smoothScale, // Return the spring value for smooth rendering
+        rawScale: scale, // Return raw value if needed for calculations
         containerRef,
-        // Methods to manually control map if needed
-        setCenter: (newX, newY) => {
-            x.set(newX);
-            y.set(newY);
-        },
+        minZoom,
+        // Methods
         zoomIn: () => scale.set(Math.min(scale.get() * 1.2, MAX_ZOOM)),
-        zoomOut: () => scale.set(Math.max(scale.get() / 1.2, MIN_ZOOM))
+        zoomOut: () => scale.set(Math.max(scale.get() / 1.2, minZoom))
     };
 }

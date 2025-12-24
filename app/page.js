@@ -4,6 +4,7 @@ import { useState } from "react";
 import EventMap from "@/components/map/EventMap";
 import BottomSheet from "@/components/ui/BottomSheet";
 import { useAudio } from "@/hooks/useAudio";
+import EventMapCity from "@/components/map/EventMapCity";
 
 export default function Home() {
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -34,7 +35,8 @@ export default function Home() {
     <main className="relative w-full h-screen overflow-hidden bg-neutral-50 dark:bg-neutral-950">
       {/* Map Layer */}
       <div className="absolute inset-0 z-0">
-        <EventMap onEventSelect={handleEventSelect} />
+        {/* <EventMap onEventSelect={handleEventSelect} /> */}
+        <EventMapCity onEventSelect={handleEventSelect} />
       </div>
 
       {/* UI Overlay */}

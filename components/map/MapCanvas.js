@@ -1,40 +1,67 @@
+
 "use client";
 
 import { motion } from "framer-motion";
 import { useMapGestures } from "@/hooks/useMapGestures";
 import { cn } from "@/lib/utils";
+import { useState, useEffect, createContext, useContext } from "react";
+
+// Create Context to share map state (like scale) with children markers
+const MapContext = createContext({ scale: 1 });
+
+export const useMapState = () => useContext(MapContext);
 
 export default function MapCanvas({ children, className }) {
     const { x, y, scale, containerRef } = useMapGestures();
+    const [constraints, setConstraints] = useState({ left: -1000, right: 1000, top: -1000, bottom: 1000 });
+
+    // We need to pass the REAL numeric scale value to children, not just the motion value
+    // However, for performance, passing the motion value is better if children use framer-motion
+    // But if we want to switch classes or do logic, we need state.
+    // For rendering resizing markers, we can pass the motion value and use style={{ scale: inverseScale }}
+
+    useEffect(() => {
+        // Calculate safe constraints based on viewport vs map content size
+        const updateConstraints = () => {
+            if (typeof window === 'undefined') return;
+
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            // Larger constraints allow "overscroll" feeling so you never feel stuck
+            setConstraints({
+                left: -w * 1.5,
+                right: w * 1.5,
+                top: -h * 1.5,
+                bottom: h * 1.5
+            });
+        };
+
+        updateConstraints();
+        window.addEventListener('resize', updateConstraints);
+        return () => window.removeEventListener('resize', updateConstraints);
+    }, []);
 
     return (
-        <div
-            ref={containerRef}
-            className={cn("relative w-full h-screen overflow-hidden bg-neutral-100 dark:bg-neutral-900 cursor-grab active:cursor-grabbing", className)}
-        >
-            <motion.div
-                className="absolute flex items-center justify-center w-[150vw] h-[150vw] origin-center" // Smaller canvas, more constrained
-                style={{ x, y, scale }}
-                drag
-                dragConstraints={{
-                    left: -window.innerWidth / 2,
-                    right: window.innerWidth / 2,
-                    top: -window.innerHeight / 2,
-                    bottom: window.innerHeight / 2
-                }}
-                dragElastic={0.2} // Bouncy edges
-                dragMomentum={true}
+        <MapContext.Provider value={{ scale }}>
+            <div
+                ref={containerRef}
+                className={cn("relative w-full h-screen overflow-hidden bg-white cursor-grab active:cursor-grabbing", className)}
             >
-                {/* The Island / Map Content */}
-                <div className="relative w-[100vmax] h-[100vmax] md:w-[60vw] md:h-[60vw]">
-                    {children}
-                </div>
-            </motion.div>
-
-            {/* Optional: Zoom Controls Overlay */}
-            <div className="absolute bottom-12 right-4 flex flex-col gap-2 z-50">
-                {/* We can add buttons here later */}
+                <motion.div
+                    className="absolute flex items-center justify-center w-[150vmax] h-[150vmax] origin-center -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2"
+                    style={{ x, y, scale }}
+                    drag
+                    dragConstraints={constraints}
+                    dragElastic={0.2}
+                    dragMomentum={true}
+                    dragTransition={{ power: 0.2, timeConstant: 200 }}
+                >
+                    {/* The Map Content */}
+                    <div className="relative w-full h-full p-[20vmax]">
+                        {children}
+                    </div>
+                </motion.div>
             </div>
-        </div>
+        </MapContext.Provider>
     );
 }

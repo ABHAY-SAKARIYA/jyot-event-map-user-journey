@@ -17,6 +17,23 @@
     "status": "Open Now"
   },
   {
+    "id": "drone-show",
+    "title": "Drone Show",
+    "category": "Performance",
+    "description": "Experience the main performances of the festival. Join us for an unforgettable journey through sound and light, where ancient wisdom meets modern mindfulness practices.",
+    "icon": "🎭",
+    "iconType": "emoji",
+    "color": "#C4A574",
+    "position": {
+      "x": 70,
+      "y": 75
+    },
+    "banner": "https://images.unsplash.com/photo-1533174072545-e8d4aa97edf9?q=80&w=1000&auto=format&fit=crop",
+    "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+    "location": "Central Zone, Main Pavilion",
+    "status": "Drone Show"
+  },
+  {
     "id": "food-court",
     "title": "Global Flavors",
     "category": "Food & Drink",
