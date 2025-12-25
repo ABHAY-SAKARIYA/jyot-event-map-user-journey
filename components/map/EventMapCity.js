@@ -44,9 +44,12 @@ function ZoomControls() {
     );
 }
 
-export default function EventMapCity({ onEventSelect }) {
-    const { events, routes } = useEventData();
+export default function EventMapCity({ onEventSelect, events: propEvents, routes: propRoutes, config }) {
+    const { events: hookEvents, routes: hookRoutes } = useEventData();
     const [selectedId, setSelectedId] = useState(null);
+
+    const events = propEvents || hookEvents;
+    const routes = propRoutes || hookRoutes;
 
     const handlePointClick = (id) => {
         setSelectedId(id);
@@ -78,7 +81,7 @@ export default function EventMapCity({ onEventSelect }) {
 
     return (
         <MapCanvas controls={<ZoomControls />}>
-            <CityMapBackground />
+            <CityMapBackground config={config} />
 
             {/* Roads Animation */}
             <div className="opacity-60">

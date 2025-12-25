@@ -1,8 +1,8 @@
 
-import { mapConfig } from "@/data/mapConfig";
+import mapConfig from "@/data/mapConfig.json";
 
-export default function CityMapBackground() {
-    const { city, ground } = mapConfig;
+export default function CityMapBackground({ config }) {
+    const { city, ground } = config || mapConfig;
 
     // Calculate Ground centering
     const x = (100 - ground.width) / 2;
