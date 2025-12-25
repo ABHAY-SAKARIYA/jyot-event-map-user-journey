@@ -1,0 +1,87 @@
+[
+    {
+        "id": "entrance",
+        "title": "Main Entrance",
+        "category": "Entry Point",
+        "description": "Welcome to the venue! Start your journey here.",
+        "icon": "🚪",
+        "iconType": "emoji",
+        "color": "#4A90E2",
+        "position": {
+            "x": 15,
+            "y": 50
+        },
+        "banner": "https://images.unsplash.com/photo-1519167758481-83f29da8c8d0?q=80&w=1000&auto=format&fit=crop",
+        "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+        "location": "Ground Floor, Main Hall",
+        "status": "Open"
+    },
+    {
+        "id": "exhibition-hall",
+        "title": "Exhibition Hall",
+        "category": "Exhibition",
+        "description": "Explore our curated collection of interactive exhibits.",
+        "icon": "🖼️",
+        "iconType": "emoji",
+        "color": "#E94B3C",
+        "position": {
+            "x": 35,
+            "y": 30
+        },
+        "banner": "https://images.unsplash.com/photo-1578926078164-61a39e6c0f2e?q=80&w=1000&auto=format&fit=crop",
+        "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3",
+        "location": "Ground Floor, North Wing",
+        "status": "Open Now"
+    },
+    {
+        "id": "conference-room",
+        "title": "Conference Room A",
+        "category": "Meeting Space",
+        "description": "Professional meeting space with state-of-the-art facilities.",
+        "icon": "💼",
+        "iconType": "emoji",
+        "color": "#6C5CE7",
+        "position": {
+            "x": 65,
+            "y": 25
+        },
+        "banner": "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1000&auto=format&fit=crop",
+        "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3",
+        "location": "First Floor, East Wing",
+        "status": "Available"
+    },
+    {
+        "id": "cafeteria",
+        "title": "Cafeteria",
+        "category": "Food & Beverage",
+        "description": "Relax and enjoy refreshments in our modern cafeteria.",
+        "icon": "☕",
+        "iconType": "emoji",
+        "color": "#F39C12",
+        "position": {
+            "x": 80,
+            "y": 55
+        },
+        "banner": "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=1000&auto=format&fit=crop",
+        "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
+        "location": "Ground Floor, South Wing",
+        "status": "Open Now"
+    },
+    {
+        "id": "workshop-area",
+        "title": "Workshop Area",
+        "category": "Activity",
+        "description": "Hands-on workshops and interactive learning sessions.",
+        "icon": "🔧",
+        "iconType": "emoji",
+        "color": "#27AE60",
+        "position": {
+            "x": 50,
+            "y": 70
+        },
+        "banner": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=1000&auto=format&fit=crop",
+        "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3",
+        "location": "Basement, Central Area",
+        "status": "Session in Progress"
+    }
+]

@@ -1,18 +1,15 @@
 
-import { readData } from "@/app/actions/admin";
+import { getMapRegistry } from "@/app/actions/admin";
 import AdminDashboardClient from "./AdminDashboardClient";
 
 export default async function DashboardPage() {
-    // Fetch data server-side
-    const events = await readData("events.json");
-    const routes = await readData("routes.json");
-    const mapConfig = await readData("mapConfig.json");
+    // Fetch map registry server-side
+    const registryResult = await getMapRegistry();
+    const registry = registryResult.success ? registryResult.data : null;
 
     return (
         <AdminDashboardClient
-            initialEvents={events || []}
-            initialRoutes={routes || []}
-            initialConfig={mapConfig || {}}
+            initialRegistry={registry}
         />
     );
 }

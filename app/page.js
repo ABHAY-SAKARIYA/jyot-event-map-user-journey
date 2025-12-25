@@ -5,10 +5,13 @@ import EventMap from "@/components/map/EventMap";
 import BottomSheet from "@/components/ui/BottomSheet";
 import { useAudio } from "@/hooks/useAudio";
 import EventMapCity from "@/components/map/EventMapCity";
+import { useEventData } from "@/hooks/useEventData";
+import Link from "next/link";
 
 export default function Home() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const audioControl = useAudio();
+  const { events, routes, loading } = useEventData();
 
   const handleEventSelect = (event) => {
     // If selecting a different event, we might want to stop previous audio? 
@@ -31,13 +34,31 @@ export default function Home() {
     audioControl.pauseTrack();
   };
 
+  if (loading) {
+    return (
+      <main className="relative w-full h-screen overflow-hidden bg-neutral-50 dark:bg-neutral-950 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-white mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading map...</p>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="relative w-full h-screen overflow-hidden bg-neutral-50 dark:bg-neutral-950">
       {/* Map Layer */}
       <div className="absolute inset-0 z-0">
-        {/* <EventMap onEventSelect={handleEventSelect} /> */}
-        <EventMapCity onEventSelect={handleEventSelect} />
+        <EventMap onEventSelect={handleEventSelect} />
       </div>
+
+      {/* Admin Button */}
+      {/* <Link
+        href="/admin/dashboard"
+        className="absolute top-4 right-4 z-20 px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg font-semibold hover:opacity-90 transition-opacity shadow-lg"
+      >
+        ⚙️ Admin
+      </Link> */}
 
       {/* UI Overlay */}
       {/* <div className="absolute top-0 left-0 p-6 z-10 pointer-events-none">

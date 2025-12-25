@@ -1,0 +1,34 @@
+{
+  "maps": [
+    {
+      "id": "city-map",
+      "name": "City Map",
+      "type": "city",
+      "description": "Illustrated city-style map with grid layout",
+      "eventsFile": "events-city.json",
+      "routesFile": "routes-city.json",
+      "configFile": "mapConfig-city.json",
+      "component": "EventMapCity"
+    },
+    {
+      "id": "venue-map",
+      "name": "Venue Floor Plan",
+      "type": "venue",
+      "description": "Indoor venue floor plan with rooms and sections",
+      "eventsFile": "events-venue.json",
+      "routesFile": "routes-venue.json",
+      "configFile": "mapConfig-venue.json",
+      "component": "EventMapVenue"
+    },
+    {
+      "id": "custom-svg",
+      "name": "Custom SVG Map",
+      "type": "custom",
+      "description": "Custom SVG map with user-defined paths",
+      "eventsFile": "events-custom.json",
+      "routesFile": "routes-custom.json",
+      "svgComponent": "CustomMapExample"
+    }
+  ],
+  "activeMapId": "custom-svg"
+}

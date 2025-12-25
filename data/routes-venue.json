@@ -1,0 +1,22 @@
+[
+    {
+        "from": "entrance",
+        "to": "exhibition-hall"
+    },
+    {
+        "from": "exhibition-hall",
+        "to": "conference-room"
+    },
+    {
+        "from": "conference-room",
+        "to": "cafeteria"
+    },
+    {
+        "from": "cafeteria",
+        "to": "workshop-area"
+    },
+    {
+        "from": "workshop-area",
+        "to": "entrance"
+    }
+]

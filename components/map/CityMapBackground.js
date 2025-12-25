@@ -2,7 +2,11 @@
 import mapConfig from "@/data/mapConfig.json";
 
 export default function CityMapBackground({ config }) {
-    const { city, ground } = config || mapConfig;
+    // Merge provided config with default mapConfig to ensure all properties exist
+    const city = config?.city || mapConfig.city;
+    const ground = config?.ground || mapConfig.ground;
+
+    if (!ground || !city) return null; // Defensive check
 
     // Calculate Ground centering
     const x = (100 - ground.width) / 2;

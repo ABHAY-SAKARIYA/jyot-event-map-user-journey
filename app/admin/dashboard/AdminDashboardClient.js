@@ -1,32 +1,69 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import EventMapCity from "@/components/map/EventMapCity";
-import { writeData } from "@/app/actions/admin";
+import EventMapVenue from "@/components/map/EventMapVenue";
+import CustomMapExample from "@/components/map/examples/CustomMapExample";
+import MapCanvas from "@/components/map/MapCanvas";
+import AnimatedPath from "@/components/map/AnimatedPath";
+import CityMapMarker from "@/components/map/CityMapMarker";
+import { writeData, updateActiveMap, getMapConfiguration } from "@/app/actions/admin";
 import { Loader2, Plus, Trash2, Save } from "lucide-react";
 
-export default function AdminDashboardClient({ initialEvents, initialRoutes, initialConfig }) {
-    const [activeTab, setActiveTab] = useState("config"); // config | events | routes
+export default function AdminDashboardClient({ initialRegistry }) {
+    const [activeTab, setActiveTab] = useState("maps"); // maps | config | events | routes
     const [isSaving, setIsSaving] = useState(false);
+    const [registry, setRegistry] = useState(initialRegistry);
+    const [selectedMapId, setSelectedMapId] = useState(initialRegistry?.activeMapId);
 
-    // Local State for editing
-    const [config, setConfig] = useState(initialConfig);
-    const [events, setEvents] = useState(initialEvents);
-    const [routes, setRoutes] = useState(initialRoutes);
+    // Local State for editing current map data
+    const [config, setConfig] = useState(null);
+    const [events, setEvents] = useState([]);
+    const [routes, setRoutes] = useState([]);
+    const [currentMapConfig, setCurrentMapConfig] = useState(null);
 
-    // Universal Save Handler - Save ALL data
+    // Load map data when selection changes
+    useEffect(() => {
+        if (selectedMapId) {
+            loadMapData(selectedMapId);
+        }
+    }, [selectedMapId]);
+
+    const loadMapData = async (mapId) => {
+        const result = await getMapConfiguration(mapId);
+        if (result.success) {
+            setCurrentMapConfig(result.data.mapConfig);
+            setEvents(result.data.events || []);
+            setRoutes(result.data.routes || []);
+            setConfig(result.data.config || {});
+        }
+    };
+
+    // Universal Save Handler - Save current map data
     const handleSave = async () => {
+        if (!currentMapConfig) return;
+
         setIsSaving(true);
         try {
-            await writeData("mapConfig.json", config);
-            await writeData("events.json", events);
-            await writeData("routes.json", routes);
+            await writeData(currentMapConfig.configFile || "mapConfig.json", config);
+            await writeData(currentMapConfig.eventsFile, events);
+            await writeData(currentMapConfig.routesFile, routes);
             alert("All changes saved successfully!");
         } catch (e) {
             alert("Error saving: " + e.message);
         }
         setIsSaving(false);
+    };
+
+    const handleApplyMap = async () => {
+        if (!selectedMapId || selectedMapId === registry?.activeMapId) return;
+
+        const result = await updateActiveMap(selectedMapId);
+        if (result.success) {
+            setRegistry(result.data);
+            alert("Active map updated! Refresh the main page to see changes.");
+        }
     };
 
     return (
@@ -38,7 +75,7 @@ export default function AdminDashboardClient({ initialEvents, initialRoutes, ini
                     <h2 className="font-bold text-lg">Map Admin</h2>
                     <button
                         onClick={handleSave}
-                        disabled={isSaving}
+                        disabled={isSaving || activeTab === "maps"}
                         className="bg-black text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-neutral-800 disabled:opacity-50"
                     >
                         {isSaving ? <Loader2 className="animate-spin w-4 h-4" /> : <Save className="w-4 h-4" />}
@@ -48,7 +85,7 @@ export default function AdminDashboardClient({ initialEvents, initialRoutes, ini
 
                 {/* Tabs */}
                 <div className="flex border-b bg-gray-50">
-                    {["config", "events", "routes"].map(tab => (
+                    {["maps", "config", "events", "routes"].map(tab => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
@@ -64,7 +101,16 @@ export default function AdminDashboardClient({ initialEvents, initialRoutes, ini
                 {/* Editor Content */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
 
-                    {activeTab === "config" && (
+                    {activeTab === "maps" && (
+                        <MapSelector
+                            registry={registry}
+                            selectedMapId={selectedMapId}
+                            onSelectMap={setSelectedMapId}
+                            onApply={handleApplyMap}
+                        />
+                    )}
+
+                    {activeTab === "config" && config && (
                         <ConfigEditor config={config} onChange={setConfig} />
                     )}
 
@@ -82,17 +128,109 @@ export default function AdminDashboardClient({ initialEvents, initialRoutes, ini
             {/* Live Preview Pane */}
             <div className="flex-1 relative bg-gray-200">
                 <div className="absolute inset-0">
-                    <EventMapCity
-                        events={events}
-                        routes={routes}
-                        config={config}
-                        onEventSelect={() => { }}
-                    />
+                    {currentMapConfig?.type === 'city' && (
+                        <EventMapCity
+                            events={events}
+                            routes={routes}
+                            config={config}
+                            onEventSelect={() => { }}
+                        />
+                    )}
+                    {currentMapConfig?.type === 'venue' && (
+                        <EventMapVenue
+                            events={events}
+                            routes={routes}
+                            config={config}
+                            onEventSelect={() => { }}
+                        />
+                    )}
+                    {currentMapConfig?.type === 'custom' && (
+                        <MapCanvas>
+                            <CustomMapExample />
+                            <div className="opacity-60">
+                                <AnimatedPath
+                                    paths={routes.map(r => {
+                                        const start = events.find(e => e.id === r.from);
+                                        const end = events.find(e => e.id === r.to);
+                                        if (!start || !end) return null;
+                                        return `M ${start.position.x} ${start.position.y} L ${end.position.x} ${end.position.y}`;
+                                    }).filter(Boolean)}
+                                />
+                            </div>
+                            {events.map((event) => (
+                                <CityMapMarker
+                                    key={event.id}
+                                    event={event}
+                                    isSelected={false}
+                                    onClick={() => { }}
+                                />
+                            ))}
+                        </MapCanvas>
+                    )}
+                    {!currentMapConfig && (
+                        <div className="flex items-center justify-center h-full text-gray-400">
+                            Select a map to preview
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
     );
 }
+
+// Map Selector Component
+function MapSelector({ registry, selectedMapId, onSelectMap, onApply }) {
+    if (!registry) {
+        return <div className="text-gray-500">No map registry found</div>;
+    }
+
+    return (
+        <div className="space-y-4">
+            <div className="space-y-3">
+                <h3 className="font-bold text-gray-900">Select Map Type</h3>
+                {registry.maps.map((map) => (
+                    <button
+                        key={map.id}
+                        onClick={() => onSelectMap(map.id)}
+                        className={`w-full p-4 rounded-lg border-2 transition-all text-left ${selectedMapId === map.id
+                            ? 'border-blue-500 bg-blue-50'
+                            : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                    >
+                        <div className="flex items-start justify-between mb-2">
+                            <div className="flex-1">
+                                <h4 className="font-semibold text-gray-900">{map.name}</h4>
+                                <p className="text-xs text-gray-600 mt-1">{map.description}</p>
+                            </div>
+                            {map.id === registry.activeMapId && (
+                                <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full font-medium">
+                                    Active
+                                </span>
+                            )}
+                        </div>
+                        <div className="text-xs text-gray-500 space-y-1">
+                            <div>Type: <span className="font-mono">{map.type}</span></div>
+                            <div>Events: <span className="font-mono">{map.eventsFile}</span></div>
+                            <div>Routes: <span className="font-mono">{map.routesFile}</span></div>
+                        </div>
+                    </button>
+                ))}
+            </div>
+
+            <button
+                onClick={onApply}
+                disabled={!selectedMapId || selectedMapId === registry.activeMapId}
+                className={`w-full py-3 rounded-lg font-semibold transition-all ${!selectedMapId || selectedMapId === registry.activeMapId
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                    }`}
+            >
+                Set as Active Map
+            </button>
+        </div>
+    );
+}
+
 
 // --- Sub-Editors (Simplified for brevity, can expand next) ---
 
@@ -109,51 +247,61 @@ function ConfigEditor({ config, onChange }) {
 
     return (
         <div className="space-y-6">
-            <div className="space-y-3">
-                <h3 className="font-bold text-gray-900">Ground Settings</h3>
-                <div className="grid grid-cols-2 gap-2">
-                    <label className="text-xs text-gray-500">Width (%)</label>
-                    <input
-                        type="number" className="border p-2 rounded"
-                        value={config.ground.width}
-                        onChange={e => handleChange('ground', 'width', parseFloat(e.target.value))}
-                    />
-                    <label className="text-xs text-gray-500">Height (%)</label>
-                    <input
-                        type="number" className="border p-2 rounded"
-                        value={config.ground.height}
-                        onChange={e => handleChange('ground', 'height', parseFloat(e.target.value))}
-                    />
+            {config.ground && (
+                <div className="space-y-3">
+                    <h3 className="font-bold text-gray-900">Ground Settings</h3>
+                    <div className="grid grid-cols-2 gap-2">
+                        <label className="text-xs text-gray-500">Width (%)</label>
+                        <input
+                            type="number" className="border p-2 rounded"
+                            value={config.ground.width}
+                            onChange={e => handleChange('ground', 'width', parseFloat(e.target.value))}
+                        />
+                        <label className="text-xs text-gray-500">Height (%)</label>
+                        <input
+                            type="number" className="border p-2 rounded"
+                            value={config.ground.height}
+                            onChange={e => handleChange('ground', 'height', parseFloat(e.target.value))}
+                        />
+                    </div>
+                    <div>
+                        <label className="text-xs text-gray-500 block mb-1">Corner Radius (TL TR BR BL)</label>
+                        <input
+                            type="text" className="border p-2 rounded w-full font-mono text-sm"
+                            value={config.ground.cornerRadius}
+                            onChange={e => handleChange('ground', 'cornerRadius', e.target.value)}
+                        />
+                    </div>
+                    <div>
+                        <label className="text-xs text-gray-500 block mb-1">Color</label>
+                        <input
+                            type="color" className="border p-1 rounded w-full h-10"
+                            value={config.ground.color}
+                            onChange={e => handleChange('ground', 'color', e.target.value)}
+                        />
+                    </div>
                 </div>
-                <div>
-                    <label className="text-xs text-gray-500 block mb-1">Corner Radius (TL TR BR BL)</label>
-                    <input
-                        type="text" className="border p-2 rounded w-full font-mono text-sm"
-                        value={config.ground.cornerRadius}
-                        onChange={e => handleChange('ground', 'cornerRadius', e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label className="text-xs text-gray-500 block mb-1">Color</label>
-                    <input
-                        type="color" className="border p-1 rounded w-full h-10"
-                        value={config.ground.color}
-                        onChange={e => handleChange('ground', 'color', e.target.value)}
-                    />
-                </div>
-            </div>
+            )}
 
-            <div className="space-y-3 border-t pt-4">
-                <h3 className="font-bold text-gray-900">City Grid</h3>
-                <div className="grid grid-cols-2 gap-2">
-                    <label className="text-xs text-gray-500">Grid Size</label>
-                    <input
-                        type="number" className="border p-2 rounded"
-                        value={config.city.gridSize}
-                        onChange={e => handleChange('city', 'gridSize', parseFloat(e.target.value))}
-                    />
+            {config.city && (
+                <div className="space-y-3 border-t pt-4">
+                    <h3 className="font-bold text-gray-900">City Grid</h3>
+                    <div className="grid grid-cols-2 gap-2">
+                        <label className="text-xs text-gray-500">Grid Size</label>
+                        <input
+                            type="number" className="border p-2 rounded"
+                            value={config.city.gridSize}
+                            onChange={e => handleChange('city', 'gridSize', parseFloat(e.target.value))}
+                        />
+                    </div>
                 </div>
-            </div>
+            )}
+
+            {!config.ground && !config.city && (
+                <div className="text-gray-500 text-sm">
+                    No editable configuration for this map type.
+                </div>
+            )}
         </div>
     )
 }

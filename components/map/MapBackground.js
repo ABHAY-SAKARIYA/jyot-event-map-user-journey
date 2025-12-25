@@ -1,4 +1,18 @@
-export default function MapBackground() {
+/**
+ * MapBackground - Renders map background with support for custom SVG components
+ * 
+ * @param {Object} props
+ * @param {string} [props.type='default'] - Background type: 'default' | 'custom'
+ * @param {React.ComponentType} [props.CustomComponent] - Custom SVG background component
+ * @param {Object} [props.customProps] - Props to pass to custom component
+ */
+export default function MapBackground({ type = 'default', CustomComponent, customProps = {} }) {
+    // Render custom SVG component if provided
+    if (type === 'custom' && CustomComponent) {
+        return <CustomComponent {...customProps} />;
+    }
+
+    // Default background
     return (
         <div className="absolute inset-0 w-full h-full pointer-events-none bg-[#e8eae6]">
             <svg

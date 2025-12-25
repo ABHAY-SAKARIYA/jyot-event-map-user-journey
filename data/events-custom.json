@@ -1,0 +1,206 @@
+[
+  {
+    "id": "point-a",
+    "title": "Point A",
+    "category": "Location",
+    "description": "Starting point on custom map",
+    "icon": "📍",
+    "iconType": "emoji",
+    "color": "#FF6B6B",
+    "position": {
+      "x": 14,
+      "y": 61
+    },
+    "banner": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=1000&auto=format&fit=crop",
+    "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+    "location": "Custom Area A",
+    "status": "Active"
+  },
+  {
+    "id": "point-b",
+    "title": "Point B",
+    "category": "Location",
+    "description": "Second point on custom map",
+    "icon": "📍",
+    "iconType": "emoji",
+    "color": "#4ECDC4",
+    "position": {
+      "x": 26,
+      "y": 67
+    },
+    "banner": "https://images.unsplash.com/photo-1511884642898-4c92249e20b6?q=80&w=1000&auto=format&fit=crop",
+    "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+    "location": "Custom Area B",
+    "status": "Active"
+  },
+  {
+    "id": "point-c",
+    "title": "Point C",
+    "category": "Location",
+    "description": "Third point on custom map",
+    "icon": "📍",
+    "iconType": "emoji",
+    "color": "#A66CFF",
+    "position": {
+      "x": 40,
+      "y": 62
+    },
+    "banner": "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=1000&auto=format&fit=crop",
+    "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+    "location": "Custom Area C",
+    "status": "Active"
+  },
+  {
+    "id": "event-1766657887518",
+    "title": "point D",
+    "position": {
+      "x": 50,
+      "y": 61
+    },
+    "category": "General",
+    "icon": "📍",
+    "iconType": "emoji",
+    "color": "#666666",
+    "description": "",
+    "banner": "",
+    "audio": "",
+    "location": "",
+    "status": "Active"
+  },
+  {
+    "id": "event-1766657908034",
+    "title": "New Event",
+    "position": {
+      "x": 64,
+      "y": 68
+    },
+    "category": "General",
+    "icon": "📍",
+    "iconType": "emoji",
+    "color": "#666666",
+    "description": "",
+    "banner": "",
+    "audio": "",
+    "location": "",
+    "status": "Active"
+  },
+  {
+    "id": "event-1766657926488",
+    "title": "New Event",
+    "position": {
+      "x": 74,
+      "y": 68
+    },
+    "category": "General",
+    "icon": "📍",
+    "iconType": "emoji",
+    "color": "#666666",
+    "description": "",
+    "banner": "",
+    "audio": "",
+    "location": "",
+    "status": "Active"
+  },
+  {
+    "id": "event-1766657949078",
+    "title": "New Event",
+    "position": {
+      "x": 83,
+      "y": 68
+    },
+    "category": "General",
+    "icon": "📍",
+    "iconType": "emoji",
+    "color": "#666666",
+    "description": "",
+    "banner": "",
+    "audio": "",
+    "location": "",
+    "status": "Active"
+  },
+  {
+    "id": "event-1766657968851",
+    "title": "New Event",
+    "position": {
+      "x": 95,
+      "y": 50
+    },
+    "category": "General",
+    "icon": "📍",
+    "iconType": "emoji",
+    "color": "#666666",
+    "description": "",
+    "banner": "",
+    "audio": "",
+    "location": "",
+    "status": "Active"
+  },
+  {
+    "id": "event-1766657982199",
+    "title": "New Event",
+    "position": {
+      "x": 95,
+      "y": 40
+    },
+    "category": "General",
+    "icon": "📍",
+    "iconType": "emoji",
+    "color": "#666666",
+    "description": "",
+    "banner": "",
+    "audio": "",
+    "location": "",
+    "status": "Active"
+  },
+  {
+    "id": "event-1766657991191",
+    "title": "New Event",
+    "position": {
+      "x": 95,
+      "y": 58
+    },
+    "category": "General",
+    "icon": "📍",
+    "iconType": "emoji",
+    "color": "#666666",
+    "description": "",
+    "banner": "",
+    "audio": "",
+    "location": "",
+    "status": "Active"
+  },
+  {
+    "id": "event-1766658001460",
+    "title": "New Event",
+    "position": {
+      "x": 95,
+      "y": 67
+    },
+    "category": "General",
+    "icon": "📍",
+    "iconType": "emoji",
+    "color": "#666666",
+    "description": "",
+    "banner": "",
+    "audio": "",
+    "location": "",
+    "status": "Active"
+  },
+  {
+    "id": "event-1766658010660",
+    "title": "New Event",
+    "position": {
+      "x": 64,
+      "y": 34
+    },
+    "category": "General",
+    "icon": "📍",
+    "iconType": "emoji",
+    "color": "#666666",
+    "description": "",
+    "banner": "",
+    "audio": "",
+    "location": "",
+    "status": "Active"
+  }
+]

@@ -1,15 +1,52 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import EventMapCity from "./EventMapCity";
+import EventMapVenue from "./EventMapVenue";
+import CustomMapExample from "./examples/CustomMapExample";
 import MapCanvas from "./MapCanvas";
-import MapBackground from "./MapBackground";
-import { motion } from "framer-motion";
-import EventPoint from "./EventPoint";
 import AnimatedPath from "./AnimatedPath";
+import CityMapMarker from "./CityMapMarker";
 import { useEventData } from "@/hooks/useEventData";
+import { useMapState } from "./MapCanvas";
+
+// Shared Zoom Controls component
+function ZoomControls() {
+    const { zoomIn, zoomOut, canZoomIn, canZoomOut } = useMapState();
+
+    return (
+        <div className="absolute bottom-24 right-4 flex flex-col gap-2 pointer-events-auto z-50">
+            <button
+                onClick={zoomIn}
+                disabled={!canZoomIn}
+                className={`w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-700 transition-all border border-gray-100
+                    ${!canZoomIn ? 'opacity-50 cursor-not-allowed blur-[0.5px]' : 'hover:bg-gray-50 active:scale-95'}
+                `}
+                aria-label="Zoom In"
+            >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+            </button>
+            <button
+                onClick={zoomOut}
+                disabled={!canZoomOut}
+                className={`w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-700 transition-all border border-gray-100
+                    ${!canZoomOut ? 'opacity-50 cursor-not-allowed blur-[0.5px]' : 'hover:bg-gray-50 active:scale-95'}
+                `}
+                aria-label="Zoom Out"
+            >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+            </button>
+        </div>
+    );
+}
 
 export default function EventMap({ onEventSelect }) {
-    const { events, routes } = useEventData();
+    const { events, routes, mapConfig, config, loading } = useEventData();
     const [selectedId, setSelectedId] = useState(null);
 
     const handlePointClick = (id) => {
@@ -20,94 +57,60 @@ export default function EventMap({ onEventSelect }) {
         }
     };
 
-    // Calculate dynamic paths based on event positions
-    const calculatedPaths = useMemo(() => {
-        if (!routes || !events) return [];
+    if (loading) return null; // Parent handles loading screen
 
-        return routes.map(route => {
-            const start = events.find(e => e.id === route.from);
-            const end = events.find(e => e.id === route.to);
+    // 1. Render Specific Components if specified
+    if (mapConfig?.type === 'city') {
+        return <EventMapCity
+            onEventSelect={onEventSelect}
+            events={events}
+            routes={routes}
+            config={config}
+        />;
+    }
 
-            if (!start || !end) return null;
+    if (mapConfig?.type === 'venue') {
+        return <EventMapVenue
+            onEventSelect={onEventSelect}
+            events={events}
+            routes={routes}
+            config={config}
+        />;
+    }
 
-            const p1 = start.position;
-            const p2 = end.position;
+    // 2. Render Custom SVG Map
+    if (mapConfig?.type === 'custom') {
+        // Here we could dynamically load based on mapConfig.svgComponent
+        // For now, we'll use the CustomMapExample or a generic one
+        return (
+            <MapCanvas controls={<ZoomControls />}>
+                {/* Background - The custom SVG provided by user */}
+                <CustomMapExample />
 
-            // Calculate a control point for a quadratic curve
-            // Simple logic: Midpoint + some perpendicular offset to make it "organic"
-            const mx = (p1.x + p2.x) / 2;
-            const my = (p1.y + p2.y) / 2;
-
-            // Offset logic: Fixed offset or pseudo-random based on coords to be deterministic
-            // We'll just curve slightly "up" or "down" based on X direction to keep it consistent
-            const dx = p2.x - p1.x;
-            const dy = p2.y - p1.y;
-
-            // Perpendicular vector (-dy, dx)
-            // Normalize roughly implies dividing by length, but we can just take a fraction
-            const offset = 10; // 10% curve magnitude
-
-            // Simple curvature: if going right, curve down; if left, curve up?
-            // Let's just do a fixed curve for now to keep it valid SVG
-
-            return `M ${p1.x} ${p1.y} Q ${mx} ${my - offset} ${p2.x} ${p2.y}`;
-        }).filter(Boolean);
-    }, [events, routes]);
-
-    return (
-        <MapCanvas>
-            <MapBackground />
-
-            {/* Dynamic Organic Paths connecting the events */}
-            <AnimatedPath
-                paths={calculatedPaths}
-            />
-
-            {/* Entry Gate */}
-            <div className="absolute text-center transform -translate-x-1/2 -translate-y-1/2" style={{ left: '50%', top: '90%' }}>
-                <span className="text-2xl">⛩️</span>
-                <div className="text-[10px] font-bold bg-white/80 px-1 rounded shadow-sm mt-1">ENTRY</div>
-            </div>
-
-            {/* Exit Gate */}
-            <div className="absolute text-center transform -translate-x-1/2 -translate-y-1/2" style={{ left: '50%', top: '10%' }}>
-                <span className="text-2xl">⛩️</span>
-                <div className="text-[10px] font-bold bg-white/80 px-1 rounded shadow-sm mt-1">EXIT</div>
-            </div>
-
-            {/* Render Event Points */}
-            {events.map((event) => (
-                <EventPoint
-                    key={event.id}
-                    event={event}
-                    isSelected={selectedId === event.id}
-                    onClick={() => handlePointClick(event.id)}
-                />
-            ))}
-
-            {/* Animated Avatar - The Small Person */}
-            <motion.div
-                className="absolute z-20 pointer-events-none"
-                initial={{ left: '50%', top: '90%' }} // Start at Entry
-                animate={{
-                    left: selectedId ? `${events.find(e => e.id === selectedId)?.position.x}%` : '50%',
-                    top: selectedId ? `${events.find(e => e.id === selectedId)?.position.y}%` : '90%'
-                }}
-                transition={{
-                    type: "spring",
-                    stiffness: 50,
-                    damping: 20,
-                    mass: 1.2,
-                    restDelta: 0.001
-                }}
-            >
-                <div className="relative -translate-x-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center">
-                    {/* Walking Person Emoji or Icon */}
-                    <span className="text-2xl filter drop-shadow-md animate-bounce">🚶</span>
-                    {/* Name Tag */}
-                    <div className="absolute -top-4 whitespace-nowrap bg-black text-white text-[8px] px-1 rounded font-bold">YOU</div>
+                {/* Routes */}
+                <div className="opacity-60">
+                    <AnimatedPath
+                        paths={routes.map(r => {
+                            const start = events.find(e => e.id === r.from);
+                            const end = events.find(e => e.id === r.to);
+                            if (!start || !end) return null;
+                            return `M ${start.position.x} ${start.position.y} L ${end.position.x} ${end.position.y}`;
+                        }).filter(Boolean)}
+                    />
                 </div>
-            </motion.div>
-        </MapCanvas>
-    );
+
+                {/* Render Event Points */}
+                {events.map((event) => (
+                    <CityMapMarker
+                        key={event.id}
+                        event={event}
+                        isSelected={selectedId === event.id}
+                        onClick={() => handlePointClick(event.id)}
+                    />
+                ))}
+            </MapCanvas>
+        );
+    }
+
+    return <div>No Map Selected</div>;
 }
