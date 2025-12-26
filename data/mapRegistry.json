@@ -28,7 +28,16 @@
       "eventsFile": "events-custom.json",
       "routesFile": "routes-custom.json",
       "svgComponent": "CustomMapExample"
+    },
+    {
+      "id": "area-map",
+      "name": "Area Map",
+      "type": "area",
+      "eventsFile": "events-area.json",
+      "routesFile": "routes-area.json",
+      "description": "August Kranti Maidan Area Map",
+      "svgComponent": "AreaMap"
     }
   ],
-  "activeMapId": "custom-svg"
+  "activeMapId": "area-map"
 }

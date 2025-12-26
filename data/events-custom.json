@@ -2,14 +2,14 @@
   {
     "id": "point-a",
     "title": "Point A",
-    "category": "Location",
+    "category": "Food",
     "description": "Starting point on custom map",
     "icon": "📍",
     "iconType": "emoji",
-    "color": "#FF6B6B",
+    "color": "#6f4d4d",
     "position": {
-      "x": 14,
-      "y": 61
+      "x": 14.06,
+      "y": 59.4
     },
     "banner": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=1000&auto=format&fit=crop",
     "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
@@ -25,8 +25,8 @@
     "iconType": "emoji",
     "color": "#4ECDC4",
     "position": {
-      "x": 26,
-      "y": 67
+      "x": 25.44,
+      "y": 64.75
     },
     "banner": "https://images.unsplash.com/photo-1511884642898-4c92249e20b6?q=80&w=1000&auto=format&fit=crop",
     "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
@@ -42,8 +42,8 @@
     "iconType": "emoji",
     "color": "#A66CFF",
     "position": {
-      "x": 40,
-      "y": 62
+      "x": 49.98,
+      "y": 59.7
     },
     "banner": "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=1000&auto=format&fit=crop",
     "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
@@ -54,8 +54,8 @@
     "id": "event-1766657887518",
     "title": "point D",
     "position": {
-      "x": 50,
-      "y": 61
+      "x": 47.43,
+      "y": 50.36
     },
     "category": "General",
     "icon": "📍",
@@ -71,8 +71,8 @@
     "id": "event-1766657908034",
     "title": "New Event",
     "position": {
-      "x": 64,
-      "y": 68
+      "x": 67.2,
+      "y": 70.59
     },
     "category": "General",
     "icon": "📍",
@@ -88,8 +88,8 @@
     "id": "event-1766657926488",
     "title": "New Event",
     "position": {
-      "x": 74,
-      "y": 68
+      "x": 75.95,
+      "y": 70.84
     },
     "category": "General",
     "icon": "📍",
@@ -105,8 +105,8 @@
     "id": "event-1766657949078",
     "title": "New Event",
     "position": {
-      "x": 83,
-      "y": 68
+      "x": 84.02,
+      "y": 68.57
     },
     "category": "General",
     "icon": "📍",
@@ -122,8 +122,8 @@
     "id": "event-1766657968851",
     "title": "New Event",
     "position": {
-      "x": 95,
-      "y": 50
+      "x": 97.02,
+      "y": 49.9
     },
     "category": "General",
     "icon": "📍",
@@ -139,8 +139,8 @@
     "id": "event-1766657982199",
     "title": "New Event",
     "position": {
-      "x": 95,
-      "y": 40
+      "x": 97.51,
+      "y": 41.7
     },
     "category": "General",
     "icon": "📍",
@@ -156,8 +156,8 @@
     "id": "event-1766657991191",
     "title": "New Event",
     "position": {
-      "x": 95,
-      "y": 58
+      "x": 96.91,
+      "y": 58.9
     },
     "category": "General",
     "icon": "📍",
@@ -173,8 +173,8 @@
     "id": "event-1766658001460",
     "title": "New Event",
     "position": {
-      "x": 95,
-      "y": 67
+      "x": 95.85,
+      "y": 68.34
     },
     "category": "General",
     "icon": "📍",
@@ -190,8 +190,25 @@
     "id": "event-1766658010660",
     "title": "New Event",
     "position": {
-      "x": 64,
-      "y": 34
+      "x": 65.95,
+      "y": 34.37
+    },
+    "category": "General",
+    "icon": "📍",
+    "iconType": "emoji",
+    "color": "#666666",
+    "description": "",
+    "banner": "",
+    "audio": "",
+    "location": "",
+    "status": "Active"
+  },
+  {
+    "id": "event-1766658320413",
+    "title": "New Event",
+    "position": {
+      "x": 22.22,
+      "y": 44.22
     },
     "category": "General",
     "icon": "📍",

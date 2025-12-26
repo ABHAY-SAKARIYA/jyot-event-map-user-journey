@@ -155,6 +155,17 @@ export function calculateViewBoxFromChildren(children, padding = 0) {
             globalMaxY = Math.max(globalMaxY, y1, y2);
         }
 
+        if (element.type === 'image') {
+            const x = parseFloat(props.x || 0);
+            const y = parseFloat(props.y || 0);
+            const width = parseFloat(props.width || 0);
+            const height = parseFloat(props.height || 0);
+            globalMinX = Math.min(globalMinX, x);
+            globalMinY = Math.min(globalMinY, y);
+            globalMaxX = Math.max(globalMaxX, x + width);
+            globalMaxY = Math.max(globalMaxY, y + height);
+        }
+
         // Recursively process children
         if (props.children) {
             processElement(props.children);

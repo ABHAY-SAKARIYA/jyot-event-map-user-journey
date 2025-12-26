@@ -101,14 +101,14 @@ export async function getMapConfiguration(mapId) {
     }
 }
 
-export async function getActiveMapConfiguration() {
+export async function getActiveMapConfiguration(selectMapId) {
     try {
         const registry = await readData("mapRegistry.json");
         if (!registry) {
             return { success: false, error: "Registry not found" };
         }
 
-        return await getMapConfiguration(registry.activeMapId);
+        return await getMapConfiguration(selectMapId || registry.activeMapId);
     } catch (error) {
         console.error("Error loading active map configuration:", error);
         return { success: false, error: error.message };

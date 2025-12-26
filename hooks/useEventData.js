@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { getActiveMapConfiguration } from "@/app/actions/admin";
 
-export function useEventData() {
+export function useEventData(selectMapId) {
   const [events, setEvents] = useState([]);
   const [routes, setRoutes] = useState([]);
   const [mapConfig, setMapConfig] = useState(null);
@@ -12,7 +12,7 @@ export function useEventData() {
 
   useEffect(() => {
     async function loadData() {
-      const result = await getActiveMapConfiguration();
+      const result = await getActiveMapConfiguration(selectMapId);
       if (result.success) {
         setEvents(result.data.events || []);
         setRoutes(result.data.routes || []);

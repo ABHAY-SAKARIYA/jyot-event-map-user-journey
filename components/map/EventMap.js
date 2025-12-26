@@ -9,6 +9,7 @@ import AnimatedPath from "./AnimatedPath";
 import CityMapMarker from "./CityMapMarker";
 import { useEventData } from "@/hooks/useEventData";
 import { useMapState } from "./MapCanvas";
+import AreaMap from "./AreaMap";
 
 // Shared Zoom Controls component
 function ZoomControls() {
@@ -45,11 +46,15 @@ function ZoomControls() {
     );
 }
 
-export default function EventMap({ onEventSelect }) {
-    const { events, routes, mapConfig, config, loading } = useEventData();
+export default function EventMap({ onEventSelect, SelectedMap, selectMapId }) {
+    const { events, routes, mapConfig, config, loading } = useEventData(selectMapId);
     const [selectedId, setSelectedId] = useState(null);
 
-    const handlePointClick = (id) => {
+    const handlePointClick = (id, onClickType, onClick) => {
+        if (onClickType !== null && onClick !== null && onClickType === 'link') {
+            window.open(onClick, "_self");
+            return;
+        }
         setSelectedId(id);
         const event = events.find((e) => e.id === id);
         if (onEventSelect) {
@@ -60,7 +65,7 @@ export default function EventMap({ onEventSelect }) {
     if (loading) return null; // Parent handles loading screen
 
     // 1. Render Specific Components if specified
-    if (mapConfig?.type === 'city') {
+    if (mapConfig?.type === 'city' || SelectedMap === 'city') {
         return <EventMapCity
             onEventSelect={onEventSelect}
             events={events}
@@ -69,7 +74,7 @@ export default function EventMap({ onEventSelect }) {
         />;
     }
 
-    if (mapConfig?.type === 'venue') {
+    if (mapConfig?.type === 'venue' || SelectedMap === 'venue') {
         return <EventMapVenue
             onEventSelect={onEventSelect}
             events={events}
@@ -79,7 +84,7 @@ export default function EventMap({ onEventSelect }) {
     }
 
     // 2. Render Custom SVG Map
-    if (mapConfig?.type === 'custom') {
+    if (mapConfig?.type === 'custom' || SelectedMap === 'custom') {
         // Here we could dynamically load based on mapConfig.svgComponent
         // For now, we'll use the CustomMapExample or a generic one
         return (
@@ -106,6 +111,38 @@ export default function EventMap({ onEventSelect }) {
                         event={event}
                         isSelected={selectedId === event.id}
                         onClick={() => handlePointClick(event.id)}
+                    />
+                ))}
+            </MapCanvas>
+        );
+    }
+    if (mapConfig?.type === 'area' || SelectedMap === 'area') {
+        // Here we could dynamically load based on mapConfig.svgComponent
+        // For now, we'll use the CustomMapExample or a generic one
+        return (
+            <MapCanvas controls={<ZoomControls />}>
+                {/* Background - The custom SVG provided by user */}
+                <AreaMap />
+
+                {/* Routes */}
+                <div className="opacity-60">
+                    <AnimatedPath
+                        paths={routes.map(r => {
+                            const start = events.find(e => e.id === r.from);
+                            const end = events.find(e => e.id === r.to);
+                            if (!start || !end) return null;
+                            return `M ${start.position.x} ${start.position.y} L ${end.position.x} ${end.position.y}`;
+                        }).filter(Boolean)}
+                    />
+                </div>
+
+                {/* Render Event Points */}
+                {events.map((event) => (
+                    <CityMapMarker
+                        key={event.id}
+                        event={event}
+                        isSelected={selectedId === event.id}
+                        onClick={() => handlePointClick(event.id, event?.onClickType, event?.onClick)}
                     />
                 ))}
             </MapCanvas>

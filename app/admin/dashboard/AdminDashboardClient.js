@@ -10,6 +10,7 @@ import AnimatedPath from "@/components/map/AnimatedPath";
 import CityMapMarker from "@/components/map/CityMapMarker";
 import { writeData, updateActiveMap, getMapConfiguration } from "@/app/actions/admin";
 import { Loader2, Plus, Trash2, Save } from "lucide-react";
+import AreaMap from "@/components/map/AreaMap";
 
 export default function AdminDashboardClient({ initialRegistry }) {
     const [activeTab, setActiveTab] = useState("maps"); // maps | config | events | routes
@@ -54,6 +55,14 @@ export default function AdminDashboardClient({ initialRegistry }) {
             alert("Error saving: " + e.message);
         }
         setIsSaving(false);
+    };
+
+    const handleEventDragEnd = (eventId, newPosition) => {
+        setEvents(prev => prev.map(event =>
+            event.id === eventId
+                ? { ...event, position: newPosition }
+                : event
+        ));
     };
 
     const handleApplyMap = async () => {
@@ -134,6 +143,8 @@ export default function AdminDashboardClient({ initialRegistry }) {
                             routes={routes}
                             config={config}
                             onEventSelect={() => { }}
+                            draggable={true}
+                            onEventDragEnd={handleEventDragEnd}
                         />
                     )}
                     {currentMapConfig?.type === 'venue' && (
@@ -142,6 +153,8 @@ export default function AdminDashboardClient({ initialRegistry }) {
                             routes={routes}
                             config={config}
                             onEventSelect={() => { }}
+                            draggable={true}
+                            onEventDragEnd={handleEventDragEnd}
                         />
                     )}
                     {currentMapConfig?.type === 'custom' && (
@@ -163,6 +176,33 @@ export default function AdminDashboardClient({ initialRegistry }) {
                                     event={event}
                                     isSelected={false}
                                     onClick={() => { }}
+                                    draggable={true}
+                                    onDragEnd={(newPos) => handleEventDragEnd(event.id, newPos)}
+                                />
+                            ))}
+                        </MapCanvas>
+                    )}
+                    {currentMapConfig?.type === 'area' && (
+                        <MapCanvas>
+                            <AreaMap />
+                            <div className="opacity-60">
+                                <AnimatedPath
+                                    paths={routes.map(r => {
+                                        const start = events.find(e => e.id === r.from);
+                                        const end = events.find(e => e.id === r.to);
+                                        if (!start || !end) return null;
+                                        return `M ${start.position.x} ${start.position.y} L ${end.position.x} ${end.position.y}`;
+                                    }).filter(Boolean)}
+                                />
+                            </div>
+                            {events.map((event) => (
+                                <CityMapMarker
+                                    key={event.id}
+                                    event={event}
+                                    isSelected={false}
+                                    onClick={() => { }}
+                                    draggable={true}
+                                    onDragEnd={(newPos) => handleEventDragEnd(event.id, newPos)}
                                 />
                             ))}
                         </MapCanvas>

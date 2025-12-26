@@ -44,7 +44,7 @@ function ZoomControls() {
     );
 }
 
-export default function EventMapCity({ onEventSelect, events: propEvents, routes: propRoutes, config }) {
+export default function EventMapCity({ onEventSelect, events: propEvents, routes: propRoutes, config, draggable = false, onEventDragEnd }) {
     const { events: hookEvents, routes: hookRoutes } = useEventData();
     const [selectedId, setSelectedId] = useState(null);
 
@@ -97,6 +97,8 @@ export default function EventMapCity({ onEventSelect, events: propEvents, routes
                     event={event}
                     isSelected={selectedId === event.id}
                     onClick={() => handlePointClick(event.id)}
+                    draggable={draggable}
+                    onDragEnd={(newPos) => onEventDragEnd?.(event.id, newPos)}
                 />
             ))}
 

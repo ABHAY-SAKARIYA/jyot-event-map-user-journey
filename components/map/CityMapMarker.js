@@ -1,8 +1,8 @@
 
 "use client";
 
-import { motion, useTransform } from "framer-motion";
-import { useMemo } from "react";
+import { motion, useTransform, useMotionValue } from "framer-motion";
+import { useMemo, useRef } from "react";
 import { useMapState } from "./MapCanvas";
 
 // --- Predefined Map Structures (Clean, Isometric-ish, Professional) ---
@@ -44,17 +44,25 @@ const Structures = {
     )
 };
 
-export default function CityMapMarker({ event, isSelected, onClick }) {
+export default function CityMapMarker({ event, isSelected, onClick, draggable = false, onDragEnd }) {
     const { position, title, color, category, icon, iconType } = event;
     const { scale } = useMapState();
 
     const markerScale = useTransform(scale, s => Math.max(1 / s, 1));
+
+    // Motion values to handle drag transforms and reset them on end
+    const dragX = useMotionValue(0);
+    const dragY = useMotionValue(0);
+
+    // Track where we grabbed the marker relative to its anchor point
+    const grabOffset = useRef({ x: 0, y: 0 });
 
     // Choose structure based on category
     const StructureIcon = useMemo(() => {
         if (!category) return Structures.Building;
         if (category.includes("Performance")) return Structures.Stage;
         if (category.includes("Wellness")) return Structures.Dome;
+        if (category.includes("exhibition")) return Structures.Dome;
         if (category.includes("Food")) return Structures.Tent;
         if (category.includes("Art")) return Structures.Dome;
         return Structures.Building;
@@ -62,55 +70,100 @@ export default function CityMapMarker({ event, isSelected, onClick }) {
 
     return (
         <motion.div
-            className="absolute -translate-x-1/2 -translate-y-full cursor-pointer group flex flex-col items-center justify-end"
+            className={`absolute z-10 ${draggable ? 'cursor-move active:cursor-grabbing' : ''}`}
             style={{
                 left: `${position.x}%`,
                 top: `${position.y}%`,
-                scale: markerScale,
-                originY: 1,
+                x: dragX,
+                y: dragY,
                 zIndex: isSelected ? 100 : 10
             }}
             onClick={onClick}
+            onPointerDown={(e) => {
+                if (draggable) e.stopPropagation();
+            }}
+            // Drag Props
+            drag={draggable}
+            dragMomentum={false}
+            dragElastic={0}
+            onDragStart={(e, info) => {
+                const container = e.target.closest('.relative.w-full.h-full.p-\\[20vmax\\]');
+                if (!container) return;
+
+                const rect = container.getBoundingClientRect();
+
+                // Current pixel position of anchor relative to container
+                const anchorX = (position.x / 100) * rect.width;
+                const anchorY = (position.y / 100) * rect.height;
+
+                // Store where we grabbed it
+                grabOffset.current = {
+                    x: info.point.x - (rect.left + anchorX),
+                    y: info.point.y - (rect.top + anchorY)
+                };
+            }}
+            onDragEnd={(e, info) => {
+                if (!onDragEnd || !draggable) return;
+
+                const container = e.target.closest('.relative.w-full.h-full.p-\\[20vmax\\]');
+                if (!container) return;
+
+                const rect = container.getBoundingClientRect();
+
+                // Calculate where the anchor should be now
+                const newAnchorPixelX = info.point.x - rect.left - grabOffset.current.x;
+                const newAnchorPixelY = info.point.y - rect.top - grabOffset.current.y;
+
+                const newX = Math.max(0, Math.min(100, parseFloat((newAnchorPixelX / rect.width * 100).toFixed(2))));
+                const newY = Math.max(0, Math.min(100, parseFloat((newAnchorPixelY / rect.height * 100).toFixed(2))));
+
+                onDragEnd({ x: newX, y: newY });
+
+                // Reset motion transforms immediately
+                dragX.set(0);
+                dragY.set(0);
+            }}
             initial={{ opacity: 0, scale: 0 }}
             animate={{ opacity: 1, scale: 1 }}
-            // whileHover={{ scale: 1.1, zIndex: 110 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
         >
-            {/* 1. The Label Pill - Floats ABOVE the structure (no overlap) */}
+
+            {/* 
+                VISUAL WRAPPER 
+                Handles scaling and anchor translation.
+                Isolating these from the drag element ensures Framer Motion calculates deltas correctly.
+            */}
             <motion.div
-                className={`
-                    relative mb-1 px-3 py-1.5 bg-white rounded-lg shadow-lg border border-gray-200 
-                    flex items-center gap-2 min-w-max transition-all
-                    ${isSelected ? 'ring-2 ring-black scale-105' : 'opacity-95'}
-                `}
-                // Initial float animation
-                initial={{ y: 5 }}
-                animate={{ y: 0 }}
+                style={{ scale: markerScale }}
+                className="relative -translate-x-1/2 -translate-y-full flex flex-col items-center justify-end pointer-events-none"
             >
-                {/* Icon */}
-                <span className="text-sm leading-none" role="img" aria-label="icon">
-                    {iconType === 'emoji' ? icon : '📍'}
-                </span>
+                {/* 1. The Label Pill */}
+                <motion.div
+                    className={`
+                        relative mb-1 px-3 py-1.5 bg-white rounded-lg shadow-lg border border-gray-200 
+                        flex items-center gap-2 min-w-max transition-all pointer-events-auto
+                        ${isSelected ? 'ring-2 ring-black scale-105' : 'opacity-95'}
+                    `}
+                    initial={{ y: 5 }}
+                    animate={{ y: 0 }}
+                >
+                    <span className="text-sm leading-none" role="img" aria-label="icon">
+                        {iconType === 'emoji' ? icon : '📍'}
+                    </span>
+                    <span className="text-[10px] font-bold text-gray-800 font-sans tracking-wide uppercase">
+                        {title}
+                    </span>
+                    <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white rotate-45 border-b border-r border-gray-200" />
+                </motion.div>
 
-                {/* Title - No truncate, let it fit naturally */}
-                <span className="text-[10px] font-bold text-gray-800 font-sans tracking-wide uppercase">
-                    {title}
-                </span>
+                {/* 2. The Structure */}
+                <div className="relative opacity-100 transition-transform hover:scale-105 pointer-events-auto">
+                    {StructureIcon(color || '#666')}
+                </div>
 
-                {/* Little pointer triangle pointing down to structure */}
-                <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white rotate-45 border-b border-r border-gray-200" />
+                {/* 3. Shadow */}
+                <div className="absolute -bottom-1 w-8 h-2 bg-black/10 rounded-[100%] z-0" />
             </motion.div>
-
-            {/* 2. The Structure (Visual Base) - Fully Visible */}
-            {/* Removed drop-shadow-md for performance */}
-            <div className="relative opacity-100 transition-transform group-hover:scale-105">
-                {/* Render the specific structure graphic */}
-                {StructureIcon(color || '#666')}
-            </div>
-
-            {/* 3. Shadow/Anchor on the ground - Removed Blur for performance */}
-            <div className="absolute -bottom-1 w-8 h-2 bg-black/10 rounded-[100%] z-0" />
-
         </motion.div>
     );
 }

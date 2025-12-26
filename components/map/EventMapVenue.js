@@ -45,7 +45,7 @@ function ZoomControls() {
 /**
  * EventMapVenue - Venue/indoor floor plan style map
  */
-export default function EventMapVenue({ onEventSelect, events, routes }) {
+export default function EventMapVenue({ onEventSelect, events, routes, draggable = false, onEventDragEnd }) {
     const [selectedId, setSelectedId] = useState(null);
 
     const handlePointClick = (id) => {
@@ -119,6 +119,8 @@ export default function EventMapVenue({ onEventSelect, events, routes }) {
                     event={event}
                     isSelected={selectedId === event.id}
                     onClick={() => handlePointClick(event.id)}
+                    draggable={draggable}
+                    onDragEnd={(newPos) => onEventDragEnd?.(event.id, newPos)}
                 />
             ))}
 
