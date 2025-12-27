@@ -10,6 +10,7 @@ import CityMapMarker from "./CityMapMarker";
 import { useEventData } from "@/hooks/useEventData";
 import { useMapState } from "./MapCanvas";
 import AreaMap from "./AreaMap";
+import ExhibitionMap2 from "./ExhibitionMap2";
 
 // Shared Zoom Controls component
 function ZoomControls() {
@@ -90,7 +91,8 @@ export default function EventMap({ onEventSelect, SelectedMap, selectMapId }) {
         return (
             <MapCanvas controls={<ZoomControls />}>
                 {/* Background - The custom SVG provided by user */}
-                <CustomMapExample />
+                {/* <CustomMapExample /> */}
+                <ExhibitionMap2 />
 
                 {/* Routes */}
                 <div className="opacity-60">

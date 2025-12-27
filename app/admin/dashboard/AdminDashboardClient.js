@@ -11,6 +11,7 @@ import CityMapMarker from "@/components/map/CityMapMarker";
 import { writeData, updateActiveMap, getMapConfiguration } from "@/app/actions/admin";
 import { Loader2, Plus, Trash2, Save } from "lucide-react";
 import AreaMap from "@/components/map/AreaMap";
+import ExhibitionMap2 from "@/components/map/ExhibitionMap2";
 
 export default function AdminDashboardClient({ initialRegistry }) {
     const [activeTab, setActiveTab] = useState("maps"); // maps | config | events | routes
@@ -159,7 +160,8 @@ export default function AdminDashboardClient({ initialRegistry }) {
                     )}
                     {currentMapConfig?.type === 'custom' && (
                         <MapCanvas>
-                            <CustomMapExample />
+                            {/* <CustomMapExample /> */}
+                            <ExhibitionMap2 />
                             <div className="opacity-60">
                                 <AnimatedPath
                                     paths={routes.map(r => {

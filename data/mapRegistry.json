@@ -27,7 +27,7 @@
       "description": "Custom SVG map with user-defined paths",
       "eventsFile": "events-custom.json",
       "routesFile": "routes-custom.json",
-      "svgComponent": "CustomMapExample"
+      "svgComponent": "ExhibitionMap2"
     },
     {
       "id": "area-map",
