@@ -11,6 +11,7 @@ import { useEventData } from "@/hooks/useEventData";
 import { useMapState } from "./MapCanvas";
 import AreaMap from "./AreaMap";
 import ExhibitionMap2 from "./ExhibitionMap2";
+import WalkingMan from "./WalkingMan";
 
 // Shared Zoom Controls component
 function ZoomControls() {
@@ -51,14 +52,20 @@ export default function EventMap({ onEventSelect, SelectedMap, selectMapId }) {
     const { events, routes, mapConfig, config, loading } = useEventData(selectMapId);
     const [selectedId, setSelectedId] = useState(null);
 
-    const handlePointClick = (id, onClickType, onClick) => {
-        if (onClickType !== null && onClick !== null && onClickType === 'link') {
-            window.open(onClick, "_self");
+    const handlePointClick = (event) => {
+        if (event.onClickType === 'link' && event.onClick) {
+            window.open(event.onClick, "_self");
             return;
         }
-        setSelectedId(id);
-        const event = events.find((e) => e.id === id);
-        if (onEventSelect) {
+
+        if (event.onClickType === 'action' && event.onClick) {
+            console.log("Triggering custom action:", event.onClick);
+            // Action framework can be integrated here
+        }
+
+        setSelectedId(event.id);
+
+        if (event.openModal !== false && onEventSelect) {
             onEventSelect(event);
         }
     };
@@ -68,19 +75,21 @@ export default function EventMap({ onEventSelect, SelectedMap, selectMapId }) {
     // 1. Render Specific Components if specified
     if (mapConfig?.type === 'city' || SelectedMap === 'city') {
         return <EventMapCity
-            onEventSelect={onEventSelect}
+            onEventSelect={handlePointClick}
             events={events}
             routes={routes}
             config={config}
+            selectedId={selectedId}
         />;
     }
 
     if (mapConfig?.type === 'venue' || SelectedMap === 'venue') {
         return <EventMapVenue
-            onEventSelect={onEventSelect}
+            onEventSelect={handlePointClick}
             events={events}
             routes={routes}
             config={config}
+            selectedId={selectedId}
         />;
     }
 
@@ -112,9 +121,11 @@ export default function EventMap({ onEventSelect, SelectedMap, selectMapId }) {
                         key={event.id}
                         event={event}
                         isSelected={selectedId === event.id}
-                        onClick={() => handlePointClick(event.id)}
+                        onClick={() => handlePointClick(event)}
                     />
                 ))}
+
+                <WalkingMan position={events.find(e => e.id === selectedId)?.position} />
             </MapCanvas>
         );
     }
@@ -144,9 +155,11 @@ export default function EventMap({ onEventSelect, SelectedMap, selectMapId }) {
                         key={event.id}
                         event={event}
                         isSelected={selectedId === event.id}
-                        onClick={() => handlePointClick(event.id, event?.onClickType, event?.onClick)}
+                        onClick={() => handlePointClick(event)}
                     />
                 ))}
+
+                <WalkingMan position={events.find(e => e.id === selectedId)?.position} />
             </MapCanvas>
         );
     }

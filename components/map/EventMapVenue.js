@@ -5,7 +5,7 @@ import MapCanvas, { useMapState } from "./MapCanvas";
 import CustomSvgBackground from "./CustomSvgBackground";
 import CityMapMarker from "./CityMapMarker";
 import AnimatedPath from "./AnimatedPath";
-import { motion } from "framer-motion";
+import WalkingMan from "./WalkingMan";
 
 // Helper component to access Map Context
 function ZoomControls() {
@@ -45,11 +45,8 @@ function ZoomControls() {
 /**
  * EventMapVenue - Venue/indoor floor plan style map
  */
-export default function EventMapVenue({ onEventSelect, events, routes, draggable = false, onEventDragEnd }) {
-    const [selectedId, setSelectedId] = useState(null);
-
+export default function EventMapVenue({ onEventSelect, events, routes, draggable = false, onEventDragEnd, selectedId }) {
     const handlePointClick = (id) => {
-        setSelectedId(id);
         const event = events?.find((e) => e.id === id);
         if (onEventSelect && event) {
             onEventSelect(event);
@@ -125,27 +122,7 @@ export default function EventMapVenue({ onEventSelect, events, routes, draggable
             ))}
 
             {/* Animated Avatar */}
-            <motion.div
-                className="absolute z-30 pointer-events-none"
-                initial={{ left: '15%', top: '50%' }}
-                animate={{
-                    left: selectedId ? `${events.find(e => e.id === selectedId)?.position.x}%` : '15%',
-                    top: selectedId ? `${events.find(e => e.id === selectedId)?.position.y}%` : '50%'
-                }}
-                transition={{
-                    type: "spring",
-                    stiffness: 40,
-                    damping: 25,
-                    mass: 1,
-                    restDelta: 0.001
-                }}
-            >
-                <div className="relative -translate-x-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center">
-                    <span className="text-3xl filter drop-shadow-md">🚶</span>
-                    <div className="absolute -top-4 whitespace-nowrap bg-black text-white text-[8px] px-1 rounded font-bold">YOU</div>
-                </div>
-            </motion.div>
-
+            <WalkingMan position={events?.find(e => e.id === selectedId)?.position} />
         </MapCanvas>
     );
 }

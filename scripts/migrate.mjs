@@ -48,11 +48,11 @@ const EventSchema = new mongoose.Schema({
 });
 
 const RouteSchema = new mongoose.Schema({
-    id: { type: String, required: true, unique: true },
+    id: { type: String, required: true },
     mapId: { type: String, required: true },
     from: { type: String, required: true },
     to: { type: String, required: true }
-});
+}, { timestamps: true });
 
 const SettingsSchema = new mongoose.Schema({
     key: { type: String, required: true, unique: true },

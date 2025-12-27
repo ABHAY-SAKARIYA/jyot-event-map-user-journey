@@ -20,6 +20,7 @@ const EventSchema = new mongoose.Schema({
     status: { type: String },
     onClickType: { type: String, enum: ['link', 'action'], default: 'link' },
     onClick: { type: String },
+    openModal: { type: Boolean, default: true },
 }, { timestamps: true });
 
 export default mongoose.models.Event || mongoose.model('Event', EventSchema);

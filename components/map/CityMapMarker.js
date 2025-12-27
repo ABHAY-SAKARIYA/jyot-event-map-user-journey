@@ -41,6 +41,21 @@ const Structures = {
             <rect x="8" y="14" width="3" height="3" fill="white" fillOpacity="0.4" />
             <rect x="13" y="14" width="3" height="3" fill="white" fillOpacity="0.4" />
         </svg>
+    ),
+    Entry: (color) => (
+        <svg viewBox="0 0 24 24" className="w-16 h-16 fill-current drop-shadow-sm" style={{ color }}>
+            {/* Gate / Entry Archetype */}
+            <path d="M4,20 L4,8 L12,4 L20,8 L20,20" fill="none" stroke="currentColor" strokeWidth="2" />
+            <path d="M7,20 L7,12 Q12,10 17,12 L17,20" fillOpacity="0.3" />
+            <text x="12" y="16" fontSize="5" textAnchor="middle" fill="white" fontWeight="bold">ENTRY</text>
+        </svg>
+    ),
+    Exit: (color) => (
+        <svg viewBox="0 0 24 24" className="w-16 h-16 fill-current drop-shadow-sm" style={{ color: '#ef4444' }}>
+            <path d="M4,20 L4,8 L12,4 L20,8 L20,20" fill="none" stroke="currentColor" strokeWidth="2" />
+            <path d="M7,20 L7,12 Q12,10 17,12 L17,20" fillOpacity="0.3" />
+            <text x="12" y="16" fontSize="5" textAnchor="middle" fill="white" fontWeight="bold">EXIT</text>
+        </svg>
     )
 };
 
@@ -60,17 +75,27 @@ export default function CityMapMarker({ event, isSelected, onClick, draggable = 
     // Choose structure based on category
     const StructureIcon = useMemo(() => {
         if (!category) return Structures.Building;
-        if (category.includes("Performance")) return Structures.Stage;
-        if (category.includes("Wellness")) return Structures.Dome;
-        if (category.includes("exhibition")) return Structures.Dome;
-        if (category.includes("Food")) return Structures.Tent;
-        if (category.includes("Art")) return Structures.Dome;
+        const cat = category.toLowerCase();
+        if (cat.includes("performance")) return Structures.Stage;
+        if (cat.includes("wellness")) return Structures.Dome;
+        if (cat.includes("exhibition")) return Structures.Dome;
+        if (cat.includes("food")) return Structures.Tent;
+        if (cat.includes("art")) return Structures.Dome;
+        if (cat.includes("entry")) return Structures.Entry;
+        if (cat.includes("exit")) return Structures.Exit;
         return Structures.Building;
     }, [category]);
 
+    const handlePointerClick = (e) => {
+        // If it's an entry/exit or openModal is false, we might want to skip the default action
+        // But user said: "if i want i can specify what should happen on click"
+        // and "if openModal is true then open the modal else not"
+        if (onClick) onClick();
+    };
+
     return (
         <motion.div
-            className={`absolute z-10 ${draggable ? 'cursor-move active:cursor-grabbing' : ''}`}
+            className={`absolute z-10 ${draggable ? 'cursor-move active:cursor-grabbing' : (event.openModal === false ? 'cursor-default' : 'cursor-pointer')}`}
             style={{
                 left: `${position.x}%`,
                 top: `${position.y}%`,
@@ -78,7 +103,7 @@ export default function CityMapMarker({ event, isSelected, onClick, draggable = 
                 y: dragY,
                 zIndex: isSelected ? 100 : 10
             }}
-            onClick={onClick}
+            onClick={handlePointerClick}
             onPointerDown={(e) => {
                 if (draggable) e.stopPropagation();
             }}

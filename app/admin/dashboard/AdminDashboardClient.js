@@ -12,6 +12,7 @@ import { updateEvents, updateRoutes, updateMapConfig, updateActiveMap, getMapCon
 import { Loader2, Plus, Trash2, Save } from "lucide-react";
 import AreaMap from "@/components/map/AreaMap";
 import ExhibitionMap2 from "@/components/map/ExhibitionMap2";
+import WalkingMan from "@/components/map/WalkingMan";
 
 export default function AdminDashboardClient({ initialRegistry }) {
     const [activeTab, setActiveTab] = useState("maps"); // maps | config | events | routes
@@ -24,6 +25,7 @@ export default function AdminDashboardClient({ initialRegistry }) {
     const [events, setEvents] = useState([]);
     const [routes, setRoutes] = useState([]);
     const [currentMapConfig, setCurrentMapConfig] = useState(null);
+    const [selectedId, setSelectedId] = useState(null);
 
     // Ensure routes have IDs for the new optimized backend
     const ensureRouteIds = (routesList) => {
@@ -157,9 +159,10 @@ export default function AdminDashboardClient({ initialRegistry }) {
                             events={events}
                             routes={routes}
                             config={config}
-                            onEventSelect={() => { }}
+                            onEventSelect={(e) => setSelectedId(e.id)}
                             draggable={true}
                             onEventDragEnd={handleEventDragEnd}
+                            selectedId={selectedId}
                         />
                     )}
                     {currentMapConfig?.type === 'venue' && (
@@ -167,9 +170,10 @@ export default function AdminDashboardClient({ initialRegistry }) {
                             events={events}
                             routes={routes}
                             config={config}
-                            onEventSelect={() => { }}
+                            onEventSelect={(e) => setSelectedId(e.id)}
                             draggable={true}
                             onEventDragEnd={handleEventDragEnd}
+                            selectedId={selectedId}
                         />
                     )}
                     {currentMapConfig?.type === 'custom' && (
@@ -190,12 +194,13 @@ export default function AdminDashboardClient({ initialRegistry }) {
                                 <CityMapMarker
                                     key={event.id}
                                     event={event}
-                                    isSelected={false}
-                                    onClick={() => { }}
+                                    isSelected={selectedId === event.id}
+                                    onClick={() => setSelectedId(event.id)}
                                     draggable={true}
                                     onDragEnd={(newPos) => handleEventDragEnd(event.id, newPos)}
                                 />
                             ))}
+                            <WalkingMan position={events.find(e => e.id === selectedId)?.position} />
                         </MapCanvas>
                     )}
                     {currentMapConfig?.type === 'area' && (
@@ -215,12 +220,13 @@ export default function AdminDashboardClient({ initialRegistry }) {
                                 <CityMapMarker
                                     key={event.id}
                                     event={event}
-                                    isSelected={false}
-                                    onClick={() => { }}
+                                    isSelected={selectedId === event.id}
+                                    onClick={() => setSelectedId(event.id)}
                                     draggable={true}
                                     onDragEnd={(newPos) => handleEventDragEnd(event.id, newPos)}
                                 />
                             ))}
+                            <WalkingMan position={events.find(e => e.id === selectedId)?.position} />
                         </MapCanvas>
                     )}
                     {!currentMapConfig && (
@@ -466,6 +472,29 @@ function EventsEditor({ events, onChange }) {
                                 <span className="text-gray-500 mb-1">Location</span>
                                 <input className="border p-1 rounded" value={event.location || ''}
                                     onChange={e => updateEvent(idx, 'location', e.target.value)} />
+                            </label>
+
+                            <div className="grid grid-cols-2 gap-2 border-t pt-2">
+                                <label className="flex flex-col text-xs">
+                                    <span className="text-gray-500 mb-1">Click Action Type</span>
+                                    <select className="border p-1 rounded" value={event.onClickType || 'link'}
+                                        onChange={e => updateEvent(idx, 'onClickType', e.target.value)}>
+                                        <option value="link">Link (URL)</option>
+                                        <option value="action">Action (Key)</option>
+                                    </select>
+                                </label>
+                                <label className="flex flex-col text-xs">
+                                    <span className="text-gray-500 mb-1">Click Value</span>
+                                    <input className="border p-1 rounded" value={event.onClick || ''}
+                                        onChange={e => updateEvent(idx, 'onClick', e.target.value)}
+                                        placeholder={event.onClickType === 'link' ? 'https://...' : 'action_name'} />
+                                </label>
+                            </div>
+
+                            <label className="flex items-center gap-2 text-xs py-1">
+                                <input type="checkbox" checked={event.openModal !== false}
+                                    onChange={e => updateEvent(idx, 'openModal', e.target.checked)} />
+                                <span className="text-gray-700">Open Detail Modal on Click</span>
                             </label>
 
                             <label className="flex flex-col text-xs">
