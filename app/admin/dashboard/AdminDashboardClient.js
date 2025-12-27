@@ -8,7 +8,7 @@ import CustomMapExample from "@/components/map/examples/CustomMapExample";
 import MapCanvas from "@/components/map/MapCanvas";
 import AnimatedPath from "@/components/map/AnimatedPath";
 import CityMapMarker from "@/components/map/CityMapMarker";
-import { writeData, updateActiveMap, getMapConfiguration } from "@/app/actions/admin";
+import { updateEvents, updateRoutes, updateMapConfig, updateActiveMap, getMapConfiguration } from "@/app/actions/admin";
 import { Loader2, Plus, Trash2, Save } from "lucide-react";
 import AreaMap from "@/components/map/AreaMap";
 import ExhibitionMap2 from "@/components/map/ExhibitionMap2";
@@ -48,10 +48,16 @@ export default function AdminDashboardClient({ initialRegistry }) {
 
         setIsSaving(true);
         try {
-            await writeData(currentMapConfig.configFile || "mapConfig.json", config);
-            await writeData(currentMapConfig.eventsFile, events);
-            await writeData(currentMapConfig.routesFile, routes);
-            alert("All changes saved successfully!");
+            const mapId = currentMapConfig.id;
+            const res1 = await updateMapConfig(mapId, config);
+            const res2 = await updateEvents(mapId, events);
+            const res3 = await updateRoutes(mapId, routes);
+
+            if (res1.success && res2.success && res3.success) {
+                alert("All changes saved successfully to MongoDB!");
+            } else {
+                alert("Error saving some data. Check console.");
+            }
         } catch (e) {
             alert("Error saving: " + e.message);
         }
