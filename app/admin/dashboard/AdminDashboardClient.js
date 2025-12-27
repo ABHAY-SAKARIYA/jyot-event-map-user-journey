@@ -25,6 +25,14 @@ export default function AdminDashboardClient({ initialRegistry }) {
     const [routes, setRoutes] = useState([]);
     const [currentMapConfig, setCurrentMapConfig] = useState(null);
 
+    // Ensure routes have IDs for the new optimized backend
+    const ensureRouteIds = (routesList) => {
+        return routesList.map(route => ({
+            ...route,
+            id: route.id || `route-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+        }));
+    };
+
     // Load map data when selection changes
     useEffect(() => {
         if (selectedMapId) {
@@ -37,7 +45,7 @@ export default function AdminDashboardClient({ initialRegistry }) {
         if (result.success) {
             setCurrentMapConfig(result.data.mapConfig);
             setEvents(result.data.events || []);
-            setRoutes(result.data.routes || []);
+            setRoutes(ensureRouteIds(result.data.routes || []));
             setConfig(result.data.config || {});
         }
     };
@@ -51,10 +59,10 @@ export default function AdminDashboardClient({ initialRegistry }) {
             const mapId = currentMapConfig.id;
             const res1 = await updateMapConfig(mapId, config);
             const res2 = await updateEvents(mapId, events);
-            const res3 = await updateRoutes(mapId, routes);
+            const res3 = await updateRoutes(mapId, ensureRouteIds(routes));
 
             if (res1.success && res2.success && res3.success) {
-                alert("All changes saved successfully to MongoDB!");
+                alert("All changes saved successfully to MongoDB (Optimized)!");
             } else {
                 alert("Error saving some data. Check console.");
             }
@@ -135,7 +143,7 @@ export default function AdminDashboardClient({ initialRegistry }) {
                     )}
 
                     {activeTab === "routes" && (
-                        <RoutesEditor routes={routes} events={events} onChange={setRoutes} />
+                        <RoutesEditor routes={routes} events={events} onChange={(newRoutes) => setRoutes(ensureRouteIds(newRoutes))} />
                     )}
 
                 </div>

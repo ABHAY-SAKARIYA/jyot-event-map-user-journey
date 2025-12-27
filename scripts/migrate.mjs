@@ -25,6 +25,7 @@ const MapSchema = new mongoose.Schema({
     configFile: { type: String },
     component: { type: String },
     svgComponent: { type: String },
+    config: { type: mongoose.Schema.Types.Mixed },
     isActive: { type: Boolean, default: false }
 });
 
@@ -41,10 +42,13 @@ const EventSchema = new mongoose.Schema({
     banner: { type: String },
     audio: { type: String },
     location: { type: String },
-    status: { type: String }
+    status: { type: String },
+    onClickType: { type: String },
+    onClick: { type: String }
 });
 
 const RouteSchema = new mongoose.Schema({
+    id: { type: String, required: true, unique: true },
     mapId: { type: String, required: true },
     from: { type: String, required: true },
     to: { type: String, required: true }
@@ -107,12 +111,16 @@ async function migrate() {
                 try {
                     const routesContent = await fs.readFile(path.join(DATA_DIR, mapData.routesFile), 'utf-8');
                     const routes = JSON.parse(routesContent);
-                    // Routes don't have unique IDs in JSON, so we might duplicate if not careful.
-                    // For migration, we'll clear and re-insert or use a simplified approach.
-                    await Route.deleteMany({ mapId: mapData.id });
+
                     if (Array.isArray(routes)) {
                         for (const routeData of routes) {
-                            await Route.create({ ...routeData, mapId: mapData.id });
+                            // Generate an ID if it doesn't exist for the new schema
+                            const routeId = routeData.id || `route-${mapData.id}-${routeData.from}-${routeData.to}`;
+                            await Route.findOneAndUpdate(
+                                { id: routeId },
+                                { ...routeData, id: routeId, mapId: mapData.id },
+                                { upsert: true }
+                            );
                         }
                     }
                     console.log(`    Done: ${routes.length} routes.`);

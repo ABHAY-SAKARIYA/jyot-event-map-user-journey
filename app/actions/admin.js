@@ -13,20 +13,39 @@ export async function readData(fileName) {
 }
 
 export async function writeData(fileName, data) {
-    // This is kept for transition but should be avoided
     console.warn("Generic writeData is deprecated. Use specific update actions.");
     return { success: false, error: "Generic writeData is deprecated. Use specific update actions like updateEvents, updateRoutes, updateMapConfig." };
 }
 
-// Replacement for writeData for Events
+// Optimized update for Events using bulkWrite
 export async function updateEvents(mapId, events) {
     try {
         await dbConnect();
-        // Delete existing events for this map and re-insert
-        await Event.deleteMany({ mapId });
-        if (events && events.length > 0) {
-            await Event.insertMany(events.map(e => ({ ...e, mapId })));
+
+        if (!events || events.length === 0) {
+            await Event.deleteMany({ mapId });
+            return { success: true };
         }
+
+        const bulkOps = events.map(event => ({
+            updateOne: {
+                filter: { id: event.id },
+                update: { $set: { ...event, mapId } },
+                upsert: true
+            }
+        }));
+
+        // Identify and delete events no longer present in the payload
+        const currentEventIds = events.map(e => e.id);
+        const deleteOp = {
+            deleteMany: {
+                filter: { mapId, id: { $nin: currentEventIds } }
+            }
+        };
+
+        bulkOps.push(deleteOp);
+
+        await Event.bulkWrite(bulkOps);
         return { success: true };
     } catch (error) {
         console.error("Error updating events:", error);
@@ -34,14 +53,35 @@ export async function updateEvents(mapId, events) {
     }
 }
 
-// Replacement for writeData for Routes
+// Optimized update for Routes using bulkWrite
 export async function updateRoutes(mapId, routes) {
     try {
         await dbConnect();
-        await Route.deleteMany({ mapId });
-        if (routes && routes.length > 0) {
-            await Route.insertMany(routes.map(r => ({ ...r, mapId })));
+
+        if (!routes || routes.length === 0) {
+            await Route.deleteMany({ mapId });
+            return { success: true };
         }
+
+        const bulkOps = routes.map(route => ({
+            updateOne: {
+                filter: { id: route.id },
+                update: { $set: { ...route, mapId } },
+                upsert: true
+            }
+        }));
+
+        // Identify and delete routes no longer present in the payload
+        const currentRouteIds = routes.map(r => r.id);
+        const deleteOp = {
+            deleteMany: {
+                filter: { mapId, id: { $nin: currentRouteIds } }
+            }
+        };
+
+        bulkOps.push(deleteOp);
+
+        await Route.bulkWrite(bulkOps);
         return { success: true };
     } catch (error) {
         console.error("Error updating routes:", error);
