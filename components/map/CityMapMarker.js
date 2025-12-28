@@ -56,6 +56,70 @@ const Structures = {
             <path d="M7,20 L7,12 Q12,10 17,12 L17,20" fillOpacity="0.3" />
             <text x="12" y="16" fontSize="5" textAnchor="middle" fill="white" fontWeight="bold">EXIT</text>
         </svg>
+    ),
+    Medical: (color) => (
+        <svg viewBox="0 0 24 24" className="w-14 h-14 fill-current drop-shadow-sm" style={{ color }}>
+            <rect x="4" y="4" width="16" height="16" rx="2" fillOpacity="0.9" />
+            <path d="M12,8 L12,16 M8,12 L16,12" stroke="white" strokeWidth="3" strokeLinecap="round" />
+        </svg>
+    ),
+    Info: (color) => (
+        <svg viewBox="0 0 24 24" className="w-14 h-14 fill-current drop-shadow-sm" style={{ color }}>
+            <circle cx="12" cy="12" r="10" fillOpacity="0.9" />
+            <path d="M12,16 L12,11 M12,8 L12,8.01" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+        </svg>
+    ),
+    Parking: (color) => (
+        <svg viewBox="0 0 24 24" className="w-14 h-14 fill-current drop-shadow-sm" style={{ color }}>
+            <rect x="4" y="4" width="16" height="16" rx="2" fillOpacity="0.9" />
+            <text x="12" y="15.5" fontSize="12" textAnchor="middle" fill="white" fontWeight="900" fontFamily="sans-serif">P</text>
+        </svg>
+    ),
+    Restroom: (color) => (
+        <svg viewBox="0 0 24 24" className="w-14 h-14 fill-current drop-shadow-sm" style={{ color }}>
+            <rect x="4" y="4" width="16" height="16" rx="2" fillOpacity="0.9" />
+            <circle cx="9" cy="9" r="1.5" fill="white" />
+            <path d="M7.5,12 L10.5,12 L10.5,16 L7.5,16 Z" fill="white" />
+            <circle cx="15" cy="9" r="1.5" fill="white" />
+            <path d="M13.5,12 L16.5,12 L16.5,16 L13.5,16 Z" fill="white" />
+            <line x1="12" y1="6" x2="12" y2="18" stroke="white" strokeWidth="0.5" strokeOpacity="0.5" />
+        </svg>
+    ),
+    Shop: (color) => (
+        <svg viewBox="0 0 24 24" className="w-14 h-14 fill-current drop-shadow-sm" style={{ color }}>
+            <path d="M6,8 L18,8 L19,20 L5,20 Z" fillOpacity="0.9" />
+            <path d="M9,10 Q9,4 12,4 Q15,4 15,10" fill="none" stroke="currentColor" strokeWidth="1.5" />
+        </svg>
+    ),
+    Workshop: (color) => (
+        <svg viewBox="0 0 24 24" className="w-14 h-14 fill-current drop-shadow-sm" style={{ color }}>
+            <path d="M12,2 L14.5,4.5 L17,4 L17.5,6.5 L20,7 L19.5,9.5 L22,12 L19.5,14.5 L20,17 L17.5,17.5 L17,20 L14.5,19.5 L12,22 L9.5,19.5 L7,20 L6.5,17.5 L4,17 L4.5,14.5 L2,12 L4.5,9.5 L4,7 L6.5,6.5 L7,4 L9.5,4.5 Z" fillOpacity="0.9" />
+            <circle cx="12" cy="12" r="3" fill="white" fillOpacity="0.3" />
+        </svg>
+    ),
+    Cafe: (color) => (
+        <svg viewBox="0 0 24 24" className="w-14 h-14 fill-current drop-shadow-sm" style={{ color }}>
+            <path d="M5,8 L17,8 L16,18 L6,18 Z" fillOpacity="0.9" />
+            <path d="M17,10 Q21,10 21,13 Q21,16 17,16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            <path d="M8,5 L8,7 M11,5 L11,7 M14,5 L14,7" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+        </svg>
+    ),
+    Security: (color) => (
+        <svg viewBox="0 0 24 24" className="w-14 h-14 fill-current drop-shadow-sm" style={{ color }}>
+            <path d="M12,2 L4,5 L4,11 Q4,17 12,22 Q20,17 20,11 L20,5 Z" fillOpacity="0.9" />
+            <path d="M12,7 L12,15 M9,12 L15,12" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+    ),
+    Theater: (color) => (
+        <svg viewBox="0 0 24 24" className="w-16 h-14 fill-current drop-shadow-sm" style={{ color }}>
+            {/* Minimalist Mask style */}
+            <path d="M2,10 Q2,4 8,4 Q14,4 14,10 Q14,16 8,16 Q2,16 2,10 Z" fillOpacity="0.8" transform="translate(0, 0) rotate(-10 8 10)" />
+            <path d="M10,10 Q10,4 16,4 Q22,4 22,10 Q22,16 16,16 Q10,16 10,10 Z" fillOpacity="0.6" transform="translate(0, 2) rotate(10 16 10)" />
+            <circle cx="5" cy="8" r="1" fill="white" />
+            <circle cx="11" cy="8" r="1" fill="white" />
+            <circle cx="13" cy="10" r="1" fill="white" />
+            <circle cx="19" cy="10" r="1" fill="white" />
+        </svg>
     )
 };
 
@@ -83,13 +147,19 @@ export default function CityMapMarker({ event, isSelected, onClick, draggable = 
         if (cat.includes("art")) return Structures.Dome;
         if (cat.includes("entry")) return Structures.Entry;
         if (cat.includes("exit")) return Structures.Exit;
+        if (cat.includes("medical")) return Structures.Medical;
+        if (cat.includes("info")) return Structures.Info;
+        if (cat.includes("parking")) return Structures.Parking;
+        if (cat.includes("restroom") || cat.includes("washroom")) return Structures.Restroom;
+        if (cat.includes("shop") || cat.includes("market")) return Structures.Shop;
+        if (cat.includes("workshop") || cat.includes("talk")) return Structures.Workshop;
+        if (cat.includes("cafe") || cat.includes("coffee") || cat.includes("drink")) return Structures.Cafe;
+        if (cat.includes("security") || cat.includes("safety")) return Structures.Security;
+        if (cat.includes("theater") || cat.includes("cinema") || cat.includes("show")) return Structures.Theater;
         return Structures.Building;
     }, [category]);
 
     const handlePointerClick = (e) => {
-        // If it's an entry/exit or openModal is false, we might want to skip the default action
-        // But user said: "if i want i can specify what should happen on click"
-        // and "if openModal is true then open the modal else not"
         if (onClick) onClick();
     };
 
@@ -156,10 +226,23 @@ export default function CityMapMarker({ event, isSelected, onClick, draggable = 
             {/* 
                 VISUAL WRAPPER 
                 Handles scaling and anchor translation.
-                Isolating these from the drag element ensures Framer Motion calculates deltas correctly.
             */}
             <motion.div
                 style={{ scale: markerScale }}
+                animate={isSelected ? {
+                    scale: [
+                        markerScale.get(),
+                        markerScale.get() * 1.05,
+                        markerScale.get()
+                    ]
+                } : {
+                    scale: markerScale.get()
+                }}
+                transition={isSelected ? {
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                } : {}}
                 className="relative -translate-x-1/2 -translate-y-full flex flex-col items-center justify-end pointer-events-none"
             >
                 {/* 1. The Label Pill */}

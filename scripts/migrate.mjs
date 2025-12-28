@@ -86,6 +86,22 @@ async function migrate() {
             );
             console.log(`- Map migrated: ${mapData.id} (Active: ${isActive})`);
 
+            // 1.5 Migrate Config for this map if configFile exists
+            if (mapData.configFile) {
+                console.log(`  Migrating Config from ${mapData.configFile}...`);
+                try {
+                    const configContent = await fs.readFile(path.join(DATA_DIR, mapData.configFile), 'utf-8');
+                    const config = JSON.parse(configContent);
+                    await Map.findOneAndUpdate(
+                        { id: mapData.id },
+                        { $set: { config } }
+                    );
+                    console.log(`    Config migrated successfully.`);
+                } catch (e) {
+                    console.warn(`    Warning: Could not read ${mapData.configFile}: ${e.message}`);
+                }
+            }
+
             // 2. Migrate Events for this map
             if (mapData.eventsFile) {
                 console.log(`  Migrating Events from ${mapData.eventsFile}...`);

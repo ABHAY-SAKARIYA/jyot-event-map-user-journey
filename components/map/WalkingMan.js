@@ -3,7 +3,7 @@
 
 import { motion } from "framer-motion";
 
-export default function WalkingMan({ position, label = "YOU", offset = { x: -2, y: 3 } }) {
+export default function WalkingMan({ position, label = "YOU", offset = { x: -0.5, y: 1 } }) {
     if (!position) return null;
 
     return (

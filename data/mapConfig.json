@@ -1,1 +1,15 @@
-{}
+{
+    "city": {
+        "gridSize": 7,
+        "streetColor": "#e0e6ed",
+        "strokeWidth": 0.5
+    },
+    "ground": {
+        "width": 70,
+        "height": 70,
+        "cornerRadius": "0 0 0 0",
+        "color": "#eef5f2",
+        "borderColor": "#dcece5",
+        "borderWidth": 1
+    }
+}

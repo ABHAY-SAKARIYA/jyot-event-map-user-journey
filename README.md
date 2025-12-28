@@ -1,36 +1,107 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 🗺️ Jyot Event Map - User Journey
 
-## Getting Started
+A premium, interactive map platform designed for events, exhibitions, and city-scale journeys. Built with a focus on aesthetics, smooth interactions, and easy administration.
 
-First, run the development server:
+![Map Preview](https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&q=80&w=1200)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## ✨ Features
+
+- **📍 Dynamic Map Markers**: Hand-crafted SVG structures for different categories (Medical, Cafe, Theater, etc.) with a subtle "breathe" animation on active points.
+- **🎨 Multiple Map Styles**:
+  - **City Map**: Isometric-style grid with parks and water features.
+  - **Venue Map**: Detailed floor plans for indoor events.
+  - **Custom SVG**: Full flexibility to use any SVG as a map background.
+- **🚶 Interactive Navigation**: "Walking Man" avatar that follows the user's journey between event points.
+- **🛠️ Admin Dashboard**:
+  - Drag-and-drop marker positioning.
+  - Direct event and route management.
+  - Real-time map configuration (colors, sizes, styles).
+- **📱 Responsive & Performant**: Highly optimized for mobile and desktop using Framer Motion for smooth transitions.
+- **🗃️ Data-Driven Architecture**: Powered by MongoDB with a flexible schema for maps, events, and routes.
+
+## 🚀 Tech Stack
+
+- **Framework**: [Next.js 14+](https://nextjs.org/) (App Router)
+- **Styling**: Vanilla CSS & Tailwind CSS for layout
+- **Animations**: [Framer Motion](https://www.framer.com/motion/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Database**: [MongoDB](https://www.mongodb.com/) via [Mongoose](https://mongoosejs.com/)
+- **State Management**: React Context & Custom Hooks
+
+## 🏁 Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- MongoDB instance (Local or Atlas)
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd user-journey
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Set up environment variables:
+   Create a `.env.local` file in the root directory:
+   ```env
+   MONGODB_URI=your_mongodb_connection_string
+   ```
+
+4. Run the migration script to populate the database:
+   ```bash
+   node scripts/migrate.mjs
+   ```
+
+5. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+## 🏗️ Project Architecture
+
+```mermaid
+graph TD
+    A[User] --> B[EventMap Component]
+    B --> C{Map Type Selection}
+    C -->|City| D[EventMapCity]
+    C -->|Venue| E[EventMapVenue]
+    C -->|Custom| F[CustomMap]
+    D & E & F --> G[MapCanvas]
+    G --> H[CityMapMarker]
+    G --> I[AnimatedPath]
+    G --> J[WalkingMan]
+    K[Admin Dashboard] -->|API Actions| L[(MongoDB)]
+    L -->|useEventData Hook| B
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📂 Folder Structure
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+- `app/`: Next.js routes and server actions.
+- `components/map/`: All map-related UI modules.
+- `data/`: Initial JSON configurations and scripts.
+- `hooks/`: Map state and data fetching logic.
+- `models/`: Mongoose database schemas.
+- `public/`: Static assets and custom SVG maps.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📋 Admin Dashboard
 
-## Learn More
+Accessed via `/admin`, the dashboard allows organizers to:
+1. **Manage Maps**: Select the active map type and edit global settings.
+2. **Edit Events**: Create, delete, and modify event details (Title, Category, Icon, etc.).
+3. **Layout**: Simply drag markers on the live preview to update their coordinates in real-time.
+4. **Define Routes**: Connect event points with animated paths.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+> [!TIP]
+> Use the **Category** field in the event editor to automatically switch the marker's architectural structure. Try "Cafe", "Security", or "Medical" for specialized visuals.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+> [!IMPORTANT]
+> The admin dashboard default password is `admin123`. You can change this in the `Settings` collection in MongoDB.

@@ -5,6 +5,7 @@ export default function CityMapBackground({ config }) {
     // Merge provided config with default mapConfig to ensure all properties exist
     const city = config?.city || mapConfig.city;
     const ground = config?.ground || mapConfig.ground;
+    console.log(city, ground);
 
     if (!ground || !city) return null; // Defensive check
 

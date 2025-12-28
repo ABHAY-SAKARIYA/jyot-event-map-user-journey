@@ -83,5 +83,80 @@
     "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
     "location": "South Plaza",
     "status": "Interactive"
+  },
+  {
+    "id": "medical-center",
+    "title": "First Aid",
+    "category": "Medical",
+    "description": "Medical assistance and first aid center.",
+    "icon": "🏥",
+    "iconType": "emoji",
+    "color": "#ef4444",
+    "position": {
+      "x": 80,
+      "y": 20
+    },
+    "location": "North Entrance",
+    "status": "24/7"
+  },
+  {
+    "id": "parking-zone",
+    "title": "East Parking",
+    "category": "Parking",
+    "description": "Public parking area.",
+    "icon": "🚗",
+    "iconType": "emoji",
+    "color": "#3b82f6",
+    "position": {
+      "x": 80,
+      "y": 80
+    },
+    "location": "East Gate",
+    "status": "Available"
+  },
+  {
+    "id": "cafe-lounge",
+    "title": "Sun Cafe",
+    "category": "Cafe",
+    "description": "Premium coffee and quick snacks lounge.",
+    "icon": "☕",
+    "iconType": "emoji",
+    "color": "#8d6e63",
+    "position": {
+      "x": 60,
+      "y": 40
+    },
+    "location": "Garden Area",
+    "status": "Open"
+  },
+  {
+    "id": "security-post",
+    "title": "Security",
+    "category": "Security",
+    "description": "Safety and security assistance.",
+    "icon": "🛡️",
+    "iconType": "emoji",
+    "color": "#455a64",
+    "position": {
+      "x": 10,
+      "y": 10
+    },
+    "location": "Main Entry",
+    "status": "Active"
+  },
+  {
+    "id": "main-theater",
+    "title": "Plaza Theater",
+    "category": "Theater",
+    "description": "Live theater performances and plays.",
+    "icon": "🎭",
+    "iconType": "emoji",
+    "color": "#9c27b0",
+    "position": {
+      "x": 60,
+      "y": 70
+    },
+    "location": "South Wing",
+    "status": "Shows starting soon"
   }
 ]
