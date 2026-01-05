@@ -469,6 +469,13 @@ function EventsEditor({ events, onChange }) {
                             </label>
 
                             <label className="flex flex-col text-xs">
+                                <span className="text-gray-500 mb-1">YouTube URL</span>
+                                <input className="border p-1 rounded text-xs" value={event.youtubeUrl || ''}
+                                    onChange={e => updateEvent(idx, 'youtubeUrl', e.target.value)}
+                                    placeholder="https://youtu.be/..." />
+                            </label>
+
+                            <label className="flex flex-col text-xs">
                                 <span className="text-gray-500 mb-1">Location</span>
                                 <input className="border p-1 rounded" value={event.location || ''}
                                     onChange={e => updateEvent(idx, 'location', e.target.value)} />

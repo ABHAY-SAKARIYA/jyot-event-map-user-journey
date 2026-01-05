@@ -8,6 +8,9 @@ export function useAudio() {
     const [currentTrack, setCurrentTrack] = useState(null);
     const [progress, setProgress] = useState(0);
 
+    const [duration, setDuration] = useState(0);
+    const [currentTime, setCurrentTime] = useState(0);
+
     // Initialize Audio element
     useEffect(() => {
         audioRef.current = new Audio();
@@ -28,18 +31,25 @@ export function useAudio() {
 
         const updateProgress = () => {
             if (audio.duration) {
+                setDuration(audio.duration);
+                setCurrentTime(audio.currentTime);
                 setProgress((audio.currentTime / audio.duration) * 100);
             }
         };
 
         const handleEnded = () => setIsPlaying(false);
+        const handleLoadedMetadata = () => {
+            setDuration(audio.duration);
+        };
 
         audio.addEventListener("timeupdate", updateProgress);
         audio.addEventListener("ended", handleEnded);
+        audio.addEventListener("loadedmetadata", handleLoadedMetadata);
 
         return () => {
             audio.removeEventListener("timeupdate", updateProgress);
             audio.removeEventListener("ended", handleEnded);
+            audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
         };
     }, [currentTrack]);
 
@@ -81,6 +91,8 @@ export function useAudio() {
         isPlaying,
         currentTrack,
         progress,
+        duration,
+        currentTime,
         playTrack,
         pauseTrack,
         seek

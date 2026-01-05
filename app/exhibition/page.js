@@ -46,7 +46,7 @@ export default function Home() {
     }
 
     return (
-        <main className="relative w-full h-screen overflow-hidden bg-neutral-50 dark:bg-neutral-950">
+        <main className="relative w-full h-screen overflow-hidden bg-white">
             {/* Map Layer */}
             <div className="absolute inset-0 z-0">
                 <EventMap onEventSelect={handleEventSelect} selectMapId={"custom-svg"} />
