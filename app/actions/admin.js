@@ -162,7 +162,7 @@ export async function updateActiveMap(mapId) {
     }
 }
 
-export async function getMapConfiguration(mapId) {
+export async function getMapConfiguration(mapId, onlyActive = false) {
     try {
         await dbConnect();
         const mapConfig = await Map.findOne({ id: mapId }).lean();
@@ -170,7 +170,12 @@ export async function getMapConfiguration(mapId) {
             return { success: false, error: "Map configuration not found" };
         }
 
-        const events = await Event.find({ mapId }).lean();
+        const eventsQuery = { mapId };
+        if (onlyActive) {
+            eventsQuery.status = "Active";
+        }
+
+        const events = await Event.find(eventsQuery).lean();
         const routes = await Route.find({ mapId }).lean();
 
         return {
@@ -202,7 +207,7 @@ export async function getActiveMapConfiguration(selectMapId) {
             return { success: false, error: "No maps found" };
         }
 
-        return await getMapConfiguration(targetId);
+        return await getMapConfiguration(targetId, true);
     } catch (error) {
         console.error("Error loading active map configuration:", error);
         return { success: false, error: error.message };

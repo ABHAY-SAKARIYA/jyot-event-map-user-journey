@@ -21,6 +21,8 @@ const EventSchema = new mongoose.Schema({
     onClickType: { type: String, enum: ['link', 'action'], default: 'link' },
     onClick: { type: String },
     youtubeUrl: { type: String },
+    group: { type: String },
+    order: { type: Number },
     openModal: { type: Boolean, default: true },
 }, { timestamps: true });
 

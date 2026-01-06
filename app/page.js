@@ -1,31 +1,53 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import EventMap from "@/components/map/EventMap";
 import BottomSheet from "@/components/ui/BottomSheet";
 import { useAudio } from "@/hooks/useAudio";
-import EventMapCity from "@/components/map/EventMapCity";
 import { useEventData } from "@/hooks/useEventData";
-import Link from "next/link";
+import { getUserProgress } from "@/app/actions/analytics";
+import MapLegend from "@/components/map/MapLegend";
+import { useUserParams } from "@/hooks/useUserParams";
+import EmailPromptModal from "@/components/ui/EmailPromptModal";
 
 export default function Home() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const audioControl = useAudio();
-  const { events, routes, loading } = useEventData();
+  const { events, routes, mapConfig, loading } = useEventData();
+  const [progress, setProgress] = useState([]);
+  const [completedIds, setCompletedIds] = useState([]);
+
+  // URL Params for Analytics
+  const userDetails = useUserParams();
+  const { userId, userEmail } = userDetails || {};
+
+  const fetchProgress = useCallback(async () => {
+    if (!userId && !userEmail) return;
+    try {
+      // Pass mapId if available
+      const mapId = mapConfig?.id;
+      const result = await getUserProgress(userId, mapId, userEmail);
+      if (result.success) {
+        setProgress(result.data);
+        setCompletedIds(result.completedIds || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch progress", error);
+    }
+  }, [userId, userEmail, mapConfig?.id]);
+
+  // Initial fetch depends on mapConfig being loaded
+  useEffect(() => {
+    if (mapConfig?.id && (userId || userEmail)) {
+      fetchProgress();
+    }
+  }, [fetchProgress, mapConfig?.id, userId, userEmail]);
 
   const handleEventSelect = (event) => {
-    // If selecting a different event, we might want to stop previous audio? 
-    // The prompt says: "Audio stops when: Another event is opened or Bottom sheet is closed"
-    // We can handle this logic here or let audioControl handle it if we passed context.
-    // The current useAudio implementation stops previous if playTrack is called with new URL.
-    // But if we just OPEN the sheet, we shouldn't auto-play necessarily unless desired.
-    // Let's just set the event. The user clicks play.
-
-    // However, "Audio stops when Bottom sheet is closed".
+    // Audio stops when Another event is opened or Bottom sheet is closed
     if (selectedEvent && selectedEvent.id !== event.id) {
       audioControl.pauseTrack();
     }
-
     setSelectedEvent(event);
   };
 
@@ -46,34 +68,27 @@ export default function Home() {
   }
 
   return (
-    <main className="relative w-full h-screen overflow-hidden bg-neutral-50 dark:bg-neutral-950">
+    <main className="relative w-full h-screen overflow-hidden bg-white">
       {/* Map Layer */}
       <div className="absolute inset-0 z-0">
-        <EventMap onEventSelect={handleEventSelect} />
+        <EventMap onEventSelect={handleEventSelect} completedIds={completedIds} />
       </div>
 
-      {/* Admin Button */}
-      {/* <Link
-        href="/admin/dashboard"
-        className="absolute top-4 right-4 z-20 px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg font-semibold hover:opacity-90 transition-opacity shadow-lg"
-      >
-        ⚙️ Admin
-      </Link> */}
+      {/* Email Prompt Modal - Shows if no email in params */}
+      <EmailPromptModal isOpen={!userEmail && !loading} />
 
-      {/* UI Overlay */}
-      {/* <div className="absolute top-0 left-0 p-6 z-10 pointer-events-none">
-        <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-neutral-800 to-neutral-500 dark:from-white dark:to-neutral-400 drop-shadow-sm">
-          EventMap
-        </h1>
-        <p className="text-neutral-500 font-medium">Interactive Festival Guide</p>
-      </div> */}
+      {/* Legend - Top Right (Sticky) */}
+      <MapLegend progress={progress} />
 
       {/* Details Sheet / Panel */}
       <BottomSheet
         event={selectedEvent}
+        allEvents={events} // Pass all events for Navigation
         isOpen={!!selectedEvent}
         onClose={handleClose}
         audioControl={audioControl}
+        onInteractionComplete={fetchProgress} // Refresh progress on close
+        onSwitchEvent={handleEventSelect}
       />
     </main>
   );

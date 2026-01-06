@@ -444,6 +444,21 @@ function EventsEditor({ events, onChange }) {
                                 </label>
                             </div>
 
+                            <div className="grid grid-cols-2 gap-2">
+                                <label className="flex flex-col text-xs">
+                                    <span className="text-gray-500 mb-1">Group</span>
+                                    <input className="border p-1 rounded" value={event.group || ''}
+                                        onChange={e => updateEvent(idx, 'group', e.target.value)}
+                                        placeholder="e.g. IT, Non-IT" />
+                                </label>
+                                <label className="flex flex-col text-xs">
+                                    <span className="text-gray-500 mb-1">Order</span>
+                                    <input type="number" className="border p-1 rounded" value={event.order || ''}
+                                        onChange={e => updateEvent(idx, 'order', parseInt(e.target.value))}
+                                        placeholder="1, 2, 3..." />
+                                </label>
+                            </div>
+
                             <label className="flex flex-col text-xs">
                                 <span className="text-gray-500 mb-1">Color</span>
                                 <input type="color" className="border p-1 rounded w-full h-8" value={event.color || '#666666'}

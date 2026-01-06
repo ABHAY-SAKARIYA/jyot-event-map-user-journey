@@ -48,7 +48,7 @@ function ZoomControls() {
     );
 }
 
-export default function EventMap({ onEventSelect, SelectedMap, selectMapId }) {
+export default function EventMap({ onEventSelect, SelectedMap, selectMapId, completedIds = [] }) {
     const { events, routes, mapConfig, config, loading } = useEventData(selectMapId);
     const [selectedId, setSelectedId] = useState(null);
 
@@ -122,6 +122,7 @@ export default function EventMap({ onEventSelect, SelectedMap, selectMapId }) {
                         event={event}
                         isSelected={selectedId === event.id}
                         onClick={() => handlePointClick(event)}
+                        isViewed={completedIds?.includes(event.id)}
                     />
                 ))}
 
@@ -156,6 +157,7 @@ export default function EventMap({ onEventSelect, SelectedMap, selectMapId }) {
                         event={event}
                         isSelected={selectedId === event.id}
                         onClick={() => handlePointClick(event)}
+                        isViewed={completedIds?.includes(event.id)}
                     />
                 ))}
 
