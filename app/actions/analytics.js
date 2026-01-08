@@ -122,3 +122,34 @@ export async function getUserProgress(userId, mapId, userEmail) {
         return { success: false, error: error.message };
     }
 }
+
+/**
+ * Check if user is a first-time visitor for this map (to toggle blur)
+ */
+export async function checkFirstTimeVisitor(userId, mapId, userEmail) {
+    try {
+        await dbConnect();
+
+        if (!userId && !userEmail) return { success: false, isFirstTime: true }; // Default to true if unknown
+
+        // Check if ANY analytics exist for this user on this map
+        const events = await Event.find({ mapId }).select("_id id").lean();
+        const mapEventIds = events.map(e => e.id);
+
+        const query = {
+            eventId: { $in: mapEventIds },
+            completed: true
+        };
+
+        if (userId) query.userId = userId;
+        else query.userEmail = userEmail;
+
+        const existing = await Analytics.exists(query);
+
+        return { success: true, isFirstTime: !existing };
+
+    } catch (error) {
+        console.error("Error checking visitor status:", error);
+        return { success: false, isFirstTime: true };
+    }
+}

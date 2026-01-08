@@ -1,17 +1,20 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import EventMapCity from "./EventMapCity";
 import EventMapVenue from "./EventMapVenue";
 import CustomMapExample from "./examples/CustomMapExample";
 import MapCanvas from "./MapCanvas";
 import AnimatedPath from "./AnimatedPath";
 import CityMapMarker from "./CityMapMarker";
+import BlurZone from "./BlurZone";
 import { useEventData } from "@/hooks/useEventData";
 import { useMapState } from "./MapCanvas";
 import AreaMap from "./AreaMap";
 import ExhibitionMap2 from "./ExhibitionMap2";
 import WalkingMan from "./WalkingMan";
+import { checkFirstTimeVisitor } from "@/app/actions/analytics";
+import { useUserParams } from "@/hooks/useUserParams";
 
 // Shared Zoom Controls component
 function ZoomControls() {
@@ -51,6 +54,22 @@ function ZoomControls() {
 export default function EventMap({ onEventSelect, SelectedMap, selectMapId, completedIds = [] }) {
     const { events, routes, mapConfig, config, loading } = useEventData(selectMapId);
     const [selectedId, setSelectedId] = useState(null);
+    const [isFirstTime, setIsFirstTime] = useState(false);
+    const [revealedZones, setRevealedZones] = useState(new Set());
+    const userDetails = useUserParams();
+
+    // Check First Time Visitor
+    useEffect(() => {
+        const checkStatus = async () => {
+            if (mapConfig?.id && (userDetails?.userId || userDetails?.userEmail)) {
+                const result = await checkFirstTimeVisitor(userDetails.userId, mapConfig.id, userDetails.userEmail);
+                if (result.success) {
+                    setIsFirstTime(result.isFirstTime);
+                }
+            }
+        };
+        checkStatus();
+    }, [mapConfig?.id, userDetails?.userId, userDetails?.userEmail]);
 
     const handlePointClick = (event) => {
         if (event.onClickType === 'link' && event.onClick) {
@@ -68,6 +87,10 @@ export default function EventMap({ onEventSelect, SelectedMap, selectMapId, comp
         if (event.openModal !== false && onEventSelect) {
             onEventSelect(event);
         }
+    };
+
+    const handleReveal = (zoneId) => {
+        setRevealedZones(prev => new Set(prev).add(zoneId));
     };
 
     if (loading) return null; // Parent handles loading screen
@@ -93,15 +116,14 @@ export default function EventMap({ onEventSelect, SelectedMap, selectMapId, comp
         />;
     }
 
-    // 2. Render Custom SVG Map
-    if (mapConfig?.type === 'custom' || SelectedMap === 'custom') {
-        // Here we could dynamically load based on mapConfig.svgComponent
-        // For now, we'll use the CustomMapExample or a generic one
+    // 2. Render Custom SVG Map (Used for Exhibition/Area)
+    if (mapConfig?.type === 'custom' || SelectedMap === 'custom' || mapConfig?.type === 'area' || SelectedMap === 'area') {
+        const MapComponent = (mapConfig?.type === 'area' || SelectedMap === 'area') ? AreaMap : ExhibitionMap2;
+
         return (
             <MapCanvas controls={<ZoomControls />}>
                 {/* Background - The custom SVG provided by user */}
-                {/* <CustomMapExample /> */}
-                <ExhibitionMap2 />
+                <MapComponent />
 
                 {/* Routes */}
                 <div className="opacity-60">
@@ -115,40 +137,15 @@ export default function EventMap({ onEventSelect, SelectedMap, selectMapId, comp
                     />
                 </div>
 
-                {/* Render Event Points */}
-                {events.map((event) => (
-                    <CityMapMarker
-                        key={event.id}
-                        event={event}
-                        isSelected={selectedId === event.id}
-                        onClick={() => handlePointClick(event)}
-                        isViewed={completedIds?.includes(event.id)}
+                {/* Blur Zones (Only if First Time & Not Revealed & configured) */}
+                {isFirstTime && mapConfig?.blurZones?.map((zone) => (
+                    <BlurZone
+                        key={zone.id || Math.random()}
+                        zone={zone}
+                        onReveal={handleReveal}
+                        isRevealed={revealedZones.has(zone.id)}
                     />
                 ))}
-
-                <WalkingMan position={events.find(e => e.id === selectedId)?.position} />
-            </MapCanvas>
-        );
-    }
-    if (mapConfig?.type === 'area' || SelectedMap === 'area') {
-        // Here we could dynamically load based on mapConfig.svgComponent
-        // For now, we'll use the CustomMapExample or a generic one
-        return (
-            <MapCanvas controls={<ZoomControls />}>
-                {/* Background - The custom SVG provided by user */}
-                <AreaMap />
-
-                {/* Routes */}
-                <div className="opacity-60">
-                    <AnimatedPath
-                        paths={routes.map(r => {
-                            const start = events.find(e => e.id === r.from);
-                            const end = events.find(e => e.id === r.to);
-                            if (!start || !end) return null;
-                            return `M ${start.position.x} ${start.position.y} L ${end.position.x} ${end.position.y}`;
-                        }).filter(Boolean)}
-                    />
-                </div>
 
                 {/* Render Event Points */}
                 {events.map((event) => (

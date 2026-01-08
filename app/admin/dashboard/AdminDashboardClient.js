@@ -8,11 +8,12 @@ import CustomMapExample from "@/components/map/examples/CustomMapExample";
 import MapCanvas from "@/components/map/MapCanvas";
 import AnimatedPath from "@/components/map/AnimatedPath";
 import CityMapMarker from "@/components/map/CityMapMarker";
-import { updateEvents, updateRoutes, updateMapConfig, updateActiveMap, getMapConfiguration } from "@/app/actions/admin";
+import { updateEvents, updateRoutes, updateMapConfig, updateActiveMap, getMapConfiguration, updateBlurZones } from "@/app/actions/admin";
 import { Loader2, Plus, Trash2, Save } from "lucide-react";
 import AreaMap from "@/components/map/AreaMap";
 import ExhibitionMap2 from "@/components/map/ExhibitionMap2";
 import WalkingMan from "@/components/map/WalkingMan";
+import BlurZone from "@/components/map/BlurZone";
 
 export default function AdminDashboardClient({ initialRegistry }) {
     const [activeTab, setActiveTab] = useState("maps"); // maps | config | events | routes
@@ -59,17 +60,22 @@ export default function AdminDashboardClient({ initialRegistry }) {
         setIsSaving(true);
         try {
             const mapId = currentMapConfig.id;
+            console.log("Saving blur zones:", currentMapConfig.blurZones);
             const res1 = await updateMapConfig(mapId, config);
             const res2 = await updateEvents(mapId, events);
             const res3 = await updateRoutes(mapId, ensureRouteIds(routes));
+            const res4 = await updateBlurZones(mapId, currentMapConfig.blurZones || []);
+            console.log("Blur zones save result:", res4);
 
-            if (res1.success && res2.success && res3.success) {
+            if (res1.success && res2.success && res3.success && res4.success) {
                 alert("All changes saved successfully to MongoDB (Optimized)!");
             } else {
                 alert("Error saving some data. Check console.");
+                console.error("Save results:", { res1, res2, res3, res4 });
             }
         } catch (e) {
             alert("Error saving: " + e.message);
+            console.error("Save error:", e);
         }
         setIsSaving(false);
     };
@@ -111,7 +117,7 @@ export default function AdminDashboardClient({ initialRegistry }) {
 
                 {/* Tabs */}
                 <div className="flex border-b bg-gray-50">
-                    {["maps", "config", "events", "routes"].map(tab => (
+                    {["maps", "config", "events", "routes", "blur"].map(tab => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
@@ -146,6 +152,16 @@ export default function AdminDashboardClient({ initialRegistry }) {
 
                     {activeTab === "routes" && (
                         <RoutesEditor routes={routes} events={events} onChange={(newRoutes) => setRoutes(ensureRouteIds(newRoutes))} />
+                    )}
+
+                    {activeTab === "blur" && (
+                        <BlurZonesEditor
+                            blurZones={currentMapConfig?.blurZones || []}
+                            onChange={(newZones) => {
+                                console.log("BlurZonesEditor onChange called with:", newZones);
+                                setCurrentMapConfig(prev => ({ ...prev, blurZones: newZones }));
+                            }}
+                        />
                     )}
 
                 </div>
@@ -190,6 +206,15 @@ export default function AdminDashboardClient({ initialRegistry }) {
                                     }).filter(Boolean)}
                                 />
                             </div>
+                            {/* Blur Zones Preview (always visible in admin) */}
+                            {currentMapConfig?.blurZones?.map((zone, idx) => (
+                                <BlurZone
+                                    key={zone.id || idx}
+                                    zone={zone}
+                                    onReveal={() => { }}
+                                    isRevealed={false}
+                                />
+                            ))}
                             {events.map((event) => (
                                 <CityMapMarker
                                     key={event.id}
@@ -224,6 +249,15 @@ export default function AdminDashboardClient({ initialRegistry }) {
                                     onClick={() => setSelectedId(event.id)}
                                     draggable={true}
                                     onDragEnd={(newPos) => handleEventDragEnd(event.id, newPos)}
+                                />
+                            ))}
+                            {/* Blur Zones Preview (always visible in admin) */}
+                            {currentMapConfig?.blurZones?.map((zone, idx) => (
+                                <BlurZone
+                                    key={zone.id || idx}
+                                    zone={zone}
+                                    onReveal={() => { }}
+                                    isRevealed={false}
                                 />
                             ))}
                             <WalkingMan position={events.find(e => e.id === selectedId)?.position} />
@@ -595,6 +629,101 @@ function RoutesEditor({ routes, events, onChange }) {
             </button>
         </div>
     )
+}
+
+function BlurZonesEditor({ blurZones, onChange }) {
+    const [expandedId, setExpandedId] = useState(null);
+
+    const updateZone = (idx, field, value) => {
+        const newZones = [...blurZones];
+        newZones[idx][field] = value;
+        onChange(newZones);
+    };
+
+    const addZone = () => {
+        const newId = "blur-" + Date.now();
+        onChange([...blurZones, {
+            id: newId,
+            x: 10,
+            y: 10,
+            width: 20,
+            height: 20,
+            message: "Hidden Area"
+        }]);
+    };
+
+    const removeZone = (idx) => {
+        onChange(blurZones.filter((_, i) => i !== idx));
+    };
+
+    return (
+        <div className="space-y-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
+                <strong>Blur Zones</strong> hide map sections for first-time visitors. Coordinates are in percentages (%).
+            </div>
+
+            {blurZones.map((zone, idx) => (
+                <div key={zone.id || idx} className="border p-3 rounded bg-gray-50">
+                    <div className="flex justify-between mb-2">
+                        <span className="font-bold text-sm">Zone {idx + 1}</span>
+                        <div className="flex gap-2">
+                            <button
+                                className="text-blue-500 text-xs"
+                                onClick={() => setExpandedId(expandedId === zone.id ? null : zone.id)}
+                            >
+                                {expandedId === zone.id ? '▼' : '▶'}
+                            </button>
+                            <button className="text-red-500" onClick={() => removeZone(idx)}>
+                                <Trash2 className="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Basic Info */}
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                        <label className="flex flex-col">
+                            <span className="text-gray-500 mb-1">X Position (%)</span>
+                            <input type="number" className="border p-1 rounded" value={zone.x}
+                                onChange={e => updateZone(idx, 'x', parseFloat(e.target.value))} />
+                        </label>
+                        <label className="flex flex-col">
+                            <span className="text-gray-500 mb-1">Y Position (%)</span>
+                            <input type="number" className="border p-1 rounded" value={zone.y}
+                                onChange={e => updateZone(idx, 'y', parseFloat(e.target.value))} />
+                        </label>
+                        <label className="flex flex-col">
+                            <span className="text-gray-500 mb-1">Width (%)</span>
+                            <input type="number" className="border p-1 rounded" value={zone.width}
+                                onChange={e => updateZone(idx, 'width', parseFloat(e.target.value))} />
+                        </label>
+                        <label className="flex flex-col">
+                            <span className="text-gray-500 mb-1">Height (%)</span>
+                            <input type="number" className="border p-1 rounded" value={zone.height}
+                                onChange={e => updateZone(idx, 'height', parseFloat(e.target.value))} />
+                        </label>
+                    </div>
+
+                    {expandedId === zone.id && (
+                        <div className="mt-2 pt-2 border-t">
+                            <label className="flex flex-col text-xs">
+                                <span className="text-gray-500 mb-1">Message</span>
+                                <input className="border p-1 rounded" value={zone.message || ''}
+                                    onChange={e => updateZone(idx, 'message', e.target.value)}
+                                    placeholder="e.g. Hidden Maze" />
+                            </label>
+                        </div>
+                    )}
+                </div>
+            ))}
+
+            <button
+                onClick={addZone}
+                className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 flex items-center justify-center gap-2 hover:border-black hover:text-black transition-colors"
+            >
+                <Plus className="w-4 h-4" /> Add Blur Zone
+            </button>
+        </div>
+    );
 }
 
 // Simple X icon for Routes

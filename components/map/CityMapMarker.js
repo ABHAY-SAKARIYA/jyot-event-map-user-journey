@@ -169,7 +169,7 @@ export default function CityMapMarker({ event, isSelected, onClick, draggable = 
 
     return (
         <motion.div
-            className={`absolute z-10 ${draggable ? 'cursor-move active:cursor-grabbing' : (event.openModal === false ? 'cursor-default' : 'cursor-pointer')}`}
+            className={`absolute z-20 ${draggable ? 'cursor-move active:cursor-grabbing' : (event.openModal === false ? 'cursor-default' : 'cursor-pointer')}`}
             style={{
                 left: `${position.x}%`,
                 top: `${position.y}%`,

@@ -75,7 +75,7 @@ export default function Home() {
       </div>
 
       {/* Email Prompt Modal - Shows if no email in params */}
-      <EmailPromptModal isOpen={!userEmail && !loading} />
+      <EmailPromptModal isOpen={(!userEmail || userEmail === "null") && !loading} />
 
       {/* Legend - Top Right (Sticky) */}
       <MapLegend progress={progress} />

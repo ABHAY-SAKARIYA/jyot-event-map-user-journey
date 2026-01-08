@@ -101,6 +101,24 @@ export async function updateMapConfig(mapId, config) {
     }
 }
 
+// Update blur zones for a map
+export async function updateBlurZones(mapId, blurZones) {
+    try {
+        await dbConnect();
+        console.log("updateBlurZones called with:", { mapId, blurZones });
+        const result = await Map.findOneAndUpdate(
+            { id: mapId },
+            { $set: { blurZones } },
+            { new: true }
+        );
+        console.log("updateBlurZones result:", result?.blurZones);
+        return { success: true };
+    } catch (error) {
+        console.error("Error updating blur zones:", error);
+        return { success: false, error: error.message };
+    }
+}
+
 export async function authenticate(formData) {
     try {
         await dbConnect();

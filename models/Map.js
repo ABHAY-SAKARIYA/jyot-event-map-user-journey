@@ -12,6 +12,14 @@ const MapSchema = new mongoose.Schema({
     component: { type: String },
     svgComponent: { type: String },
     config: { type: mongoose.Schema.Types.Mixed },
+    blurZones: [{
+        id: { type: String },
+        x: { type: Number }, // %
+        y: { type: Number }, // %
+        width: { type: Number }, // %
+        height: { type: Number }, // %
+        message: { type: String }
+    }],
     isActive: { type: Boolean, default: false }
 }, { timestamps: true });
 
