@@ -20,6 +20,10 @@ const MapSchema = new mongoose.Schema({
         height: { type: Number }, // %
         message: { type: String }
     }],
+    completionMessage: {
+        type: String,
+        default: "🎉 Congratulations! You've completed the journey thoroughly and must have learned something from this!"
+    },
     isActive: { type: Boolean, default: false }
 }, { timestamps: true });
 

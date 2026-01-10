@@ -153,3 +153,131 @@ export async function checkFirstTimeVisitor(userId, mapId, userEmail) {
         return { success: false, isFirstTime: true };
     }
 }
+
+/**
+ * Save or update map session data (WebView-compatible)
+ */
+export async function saveMapSession(data) {
+    try {
+        await dbConnect();
+
+        const { userId, userEmail, mapId, sessionId, duration, activeDuration } = data;
+
+        // Validation
+        if ((!userId && !userEmail) || !mapId || !sessionId) {
+            return { success: false, error: "Missing required fields" };
+        }
+
+        // Store session data with special eventId pattern
+        const sessionEventId = `map-session-${mapId}`;
+
+        const query = {
+            eventId: sessionEventId,
+            mapSessionId: sessionId
+        };
+        if (userId) query.userId = userId;
+        else query.userEmail = userEmail;
+
+        const existing = await Analytics.findOne(query);
+
+        if (existing) {
+            // Update existing session
+            existing.totalSessionDuration = duration;
+            existing.activeSessionDuration = activeDuration;
+            existing.sessionLastUpdate = new Date();
+            await existing.save();
+        } else {
+            // Create new session record
+            await Analytics.create({
+                userId,
+                userEmail,
+                eventId: sessionEventId,
+                mapSessionId: sessionId,
+                sessionStartTime: new Date(),
+                sessionLastUpdate: new Date(),
+                totalSessionDuration: duration,
+                activeSessionDuration: activeDuration,
+                completed: false
+            });
+        }
+
+        return { success: true };
+    } catch (error) {
+        console.error("Error saving map session:", error);
+        return { success: false, error: error.message };
+    }
+}
+
+/**
+ * Check if user has already seen the completion celebration
+ */
+export async function checkHasSeenCelebration(userId, mapId, userEmail) {
+    try {
+        await dbConnect();
+
+        if (!userId && !userEmail) {
+            return { success: false, hasSeenCelebration: false };
+        }
+
+        // Check any analytics record for this user on this map
+        const events = await Event.find({ mapId }).select("id").lean();
+        const eventIds = events.map(e => e.id);
+
+        const query = {
+            eventId: { $in: eventIds },
+            hasSeenCelebration: true
+        };
+
+        if (userId) query.userId = userId;
+        else query.userEmail = userEmail;
+
+        const record = await Analytics.findOne(query);
+
+        return {
+            success: true,
+            hasSeenCelebration: !!record
+        };
+    } catch (error) {
+        console.error("Error checking celebration status:", error);
+        return { success: false, hasSeenCelebration: false };
+    }
+}
+
+/**
+ * Mark that user has seen the celebration (once per user ever)
+ */
+export async function markCelebrationSeen(userId, mapId, userEmail) {
+    try {
+        await dbConnect();
+
+        if (!userId && !userEmail) {
+            return { success: false, error: "User identification required" };
+        }
+
+        // Update ALL analytics records for this user on this map
+        const events = await Event.find({ mapId }).select("id").lean();
+        const eventIds = events.map(e => e.id);
+
+        const query = {
+            eventId: { $in: eventIds }
+        };
+
+        if (userId) query.userId = userId;
+        else query.userEmail = userEmail;
+
+        await Analytics.updateMany(
+            query,
+            {
+                $set: {
+                    hasSeenCelebration: true,
+                    celebrationShownAt: new Date()
+                }
+            }
+        );
+
+        return { success: true };
+    } catch (error) {
+        console.error("Error marking celebration seen:", error);
+        return { success: false, error: error.message };
+    }
+}

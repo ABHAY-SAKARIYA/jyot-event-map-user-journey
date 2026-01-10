@@ -119,6 +119,22 @@ export async function updateBlurZones(mapId, blurZones) {
     }
 }
 
+// Update completion message for a map
+export async function updateCompletionMessage(mapId, completionMessage) {
+    try {
+        await dbConnect();
+        await Map.findOneAndUpdate(
+            { id: mapId },
+            { $set: { completionMessage } },
+            { new: true }
+        );
+        return { success: true };
+    } catch (error) {
+        console.error("Error updating completion message:", error);
+        return { success: false, error: error.message };
+    }
+}
+
 export async function authenticate(formData) {
     try {
         await dbConnect();

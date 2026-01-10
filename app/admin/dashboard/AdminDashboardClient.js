@@ -8,7 +8,7 @@ import CustomMapExample from "@/components/map/examples/CustomMapExample";
 import MapCanvas from "@/components/map/MapCanvas";
 import AnimatedPath from "@/components/map/AnimatedPath";
 import CityMapMarker from "@/components/map/CityMapMarker";
-import { updateEvents, updateRoutes, updateMapConfig, updateActiveMap, getMapConfiguration, updateBlurZones } from "@/app/actions/admin";
+import { updateEvents, updateRoutes, updateMapConfig, updateActiveMap, getMapConfiguration, updateBlurZones, updateCompletionMessage } from "@/app/actions/admin";
 import { Loader2, Plus, Trash2, Save } from "lucide-react";
 import AreaMap from "@/components/map/AreaMap";
 import ExhibitionMap2 from "@/components/map/ExhibitionMap2";

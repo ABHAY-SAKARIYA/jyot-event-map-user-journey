@@ -12,7 +12,18 @@ const AnalyticsSchema = new mongoose.Schema({
     audioListenDuration: { type: Number, default: 0 }, // Seconds
 
     completed: { type: Boolean, default: false }, // If viewDuration > 5s
-    timestamp: { type: Date, default: Date.now }
+    timestamp: { type: Date, default: Date.now },
+
+    // Session Tracking (WebView-compatible)
+    mapSessionId: { type: String, index: true }, // Unique per page load
+    sessionStartTime: { type: Date }, // When user entered map
+    sessionLastUpdate: { type: Date }, // Last periodic save timestamp
+    totalSessionDuration: { type: Number, default: 0 }, // Total seconds on map
+    activeSessionDuration: { type: Number, default: 0 }, // Active tab time only
+
+    // Journey Completion
+    hasSeenCelebration: { type: Boolean, default: false }, // Once per user ever
+    celebrationShownAt: { type: Date } // When celebration was shown
 }, { timestamps: true });
 
 // Compound index to quickly find user progress
