@@ -78,17 +78,37 @@ export default function Home() {
     });
   }, [shouldTrackSession, mapConfig?.id, userId, userEmail]);
 
+  // Periodic save function
+  const saveSession = useCallback(async () => {
+    if (!isTrackingRef.current || !mapConfig?.id) return;
+
+    const totalDuration = (Date.now() - sessionStartRef.current) / 1000;
+    const activeDuration = activeTimeRef.current +
+      (document.hidden || !lastActiveRef.current ? 0 : (Date.now() - lastActiveRef.current) / 1000);
+
+    await saveMapSession({
+      userId,
+      userEmail,
+      mapId: mapConfig.id,
+      sessionId: sessionIdRef.current,
+      duration: totalDuration,
+      activeDuration
+    });
+  }, [userId, userEmail, mapConfig?.id]);
+
   // Track visibility changes (works in WebView)
   useEffect(() => {
     if (!shouldTrackSession) return;
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        // Tab/app backgrounded - save current active time
+        // Tab/app backgrounded - save current active time AND save session
         if (lastActiveRef.current) {
           activeTimeRef.current += (Date.now() - lastActiveRef.current) / 1000;
           lastActiveRef.current = null;
         }
+        // Save immediately when hiding (more reliable than onUnmount)
+        saveSession();
       } else {
         // Tab/app foregrounded - restart timer
         lastActiveRef.current = Date.now();
@@ -97,39 +117,22 @@ export default function Home() {
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [shouldTrackSession]);
+  }, [shouldTrackSession, saveSession]);
 
-  // Periodic save (PRIMARY method for WebView - every 20 seconds)
+  // Periodic save (PRIMARY method for WebView - every 20 seconds) & Cleanup
   useEffect(() => {
     if (!shouldTrackSession || !mapConfig?.id) return;
 
-    const saveSession = async () => {
-      if (!isTrackingRef.current) return;
-
-      const totalDuration = (Date.now() - sessionStartRef.current) / 1000;
-      const activeDuration = activeTimeRef.current +
-        (document.hidden || !lastActiveRef.current ? 0 : (Date.now() - lastActiveRef.current) / 1000);
-
-      await saveMapSession({
-        userId,
-        userEmail,
-        mapId: mapConfig.id,
-        sessionId: sessionIdRef.current,
-        duration: totalDuration,
-        activeDuration
-      });
-    };
-
-    // Save every 20 seconds (optimized for WebView)
+    // Save every 20 seconds
     const interval = setInterval(saveSession, 20000);
 
-    // Final save on unmount (best effort - may not fire in WebView)
+    // Final save on unmount
     return () => {
       clearInterval(interval);
       isTrackingRef.current = false;
       saveSession();
     };
-  }, [shouldTrackSession, userId, userEmail, mapConfig?.id]);
+  }, [shouldTrackSession, mapConfig?.id, saveSession]);
 
   // Check if user has already seen celebration (on mount)
   useEffect(() => {

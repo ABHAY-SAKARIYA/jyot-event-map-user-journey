@@ -5,7 +5,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import { X } from "lucide-react";
 
+import { useRouter, useSearchParams } from "next/navigation";
+
 export default function CelebrationModal({ isOpen, message, onClose }) {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
     // Trigger confetti when modal opens
     useEffect(() => {
         if (!isOpen) return;
@@ -41,6 +46,15 @@ export default function CelebrationModal({ isOpen, message, onClose }) {
             confetti.reset();
         };
     }, [isOpen]);
+
+    const handleStartQuiz = () => {
+        // Forward all existing params to the quiz page
+        const params = searchParams.toString();
+        const url = `/quiz${params ? `?${params}` : ''}`;
+
+        // Use replace to avoid back-history confusion in WebViews
+        router.replace(url);
+    };
 
     const defaultMessage = "🎉 Congratulations! You've completed the journey thoroughly and must have learned something from this!";
     const displayMessage = message || defaultMessage;
@@ -93,13 +107,22 @@ export default function CelebrationModal({ isOpen, message, onClose }) {
                                     </p>
                                 </div>
 
-                                {/* Close Button (alternative) */}
-                                <button
-                                    onClick={onClose}
-                                    className="w-full py-4 bg-[#FA5429] text-white rounded-2xl font-bold text-lg hover:bg-[#E94A23] transition-colors active:scale-95"
-                                >
-                                    Continue Exploring
-                                </button>
+                                {/* Action Buttons */}
+                                <div className="space-y-3">
+                                    <button
+                                        onClick={handleStartQuiz}
+                                        className="w-full py-4 bg-[#FA5429] text-white rounded-2xl font-bold text-lg hover:bg-[#E94A23] transition-colors active:scale-95 shadow-lg shadow-orange-200"
+                                    >
+                                        Start Quiz
+                                    </button>
+
+                                    <button
+                                        onClick={onClose}
+                                        className="text-gray-500 font-medium hover:text-gray-700 text-sm"
+                                    >
+                                        Return to Map
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </motion.div>

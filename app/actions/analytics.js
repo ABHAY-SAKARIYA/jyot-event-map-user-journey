@@ -168,31 +168,29 @@ export async function saveMapSession(data) {
             return { success: false, error: "Missing required fields" };
         }
 
-        // Store session data with special eventId pattern
-        const sessionEventId = `map-session-${mapId}`;
+        // Use MapSession model
+        // Try to find existing session first
+        const existing = await import("@/models/MapSession").then(mod => mod.default.findOne({ sessionId }));
 
-        const query = {
-            eventId: sessionEventId,
-            mapSessionId: sessionId
-        };
-        if (userId) query.userId = userId;
-        else query.userEmail = userEmail;
-
-        const existing = await Analytics.findOne(query);
+        const MapSession = (await import("@/models/MapSession")).default;
 
         if (existing) {
             // Update existing session
             existing.totalSessionDuration = duration;
             existing.activeSessionDuration = activeDuration;
             existing.sessionLastUpdate = new Date();
+            // Update user identification if it was missing and is now provided (e.g. login during session)
+            if (userEmail && !existing.userEmail) existing.userEmail = userEmail;
+            if (userId && !existing.userId) existing.userId = userId;
+
             await existing.save();
         } else {
             // Create new session record
-            await Analytics.create({
+            await MapSession.create({
                 userId,
                 userEmail,
-                eventId: sessionEventId,
-                mapSessionId: sessionId,
+                mapId,
+                sessionId,
                 sessionStartTime: new Date(),
                 sessionLastUpdate: new Date(),
                 totalSessionDuration: duration,
