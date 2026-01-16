@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import EventMap from "@/components/map/EventMap";
 import BottomSheet from "@/components/ui/BottomSheet";
 import { useAudio } from "@/hooks/useAudio";
@@ -10,7 +10,7 @@ import MapLegend from "@/components/map/MapLegend";
 import { useUserParams } from "@/hooks/useUserParams";
 import EmailPromptModal from "@/components/ui/EmailPromptModal";
 
-export default function Home() {
+function ExhibitionContent() {
     const [selectedEvent, setSelectedEvent] = useState(null);
     const audioControl = useAudio();
     const { events, routes, mapConfig, loading } = useEventData(); // Get mapConfig
@@ -91,5 +91,20 @@ export default function Home() {
                 onSwitchEvent={handleEventSelect}
             />
         </main>
+    );
+}
+
+export default function ExhibitionPage() {
+    return (
+        <Suspense fallback={
+            <main className="relative w-full h-screen overflow-hidden bg-neutral-50 dark:bg-neutral-950 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-white mx-auto mb-4"></div>
+                    <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+                </div>
+            </main>
+        }>
+            <ExhibitionContent />
+        </Suspense>
     );
 }

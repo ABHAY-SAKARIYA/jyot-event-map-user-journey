@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
 import { getQuizQuestions, submitQuiz } from "@/app/actions/quiz";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { useUserParams } from "@/hooks/useUserParams";
 
-export default function QuizPage() {
+function QuizPageContent() {
     const [status, setStatus] = useState("idle"); // idle, loading, active, submitting, completed, error
     const [questions, setQuestions] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -254,5 +254,17 @@ export default function QuizPage() {
 
             </div>
         </div>
+    );
+}
+
+export default function QuizPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+                <Loader2 className="w-10 h-10 text-[#FA5429] animate-spin" />
+            </div>
+        }>
+            <QuizPageContent />
+        </Suspense>
     );
 }

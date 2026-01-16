@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import EventMap from "@/components/map/EventMap";
 import BottomSheet from "@/components/ui/BottomSheet";
 import { useAudio } from "@/hooks/useAudio";
@@ -11,7 +11,7 @@ import { useUserParams } from "@/hooks/useUserParams";
 import EmailPromptModal from "@/components/ui/EmailPromptModal";
 import CelebrationModal from "@/components/ui/CelebrationModal";
 
-export default function Home() {
+function HomeContent() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const audioControl = useAudio();
   const { events, routes, mapConfig, loading } = useEventData();
@@ -237,5 +237,20 @@ export default function Home() {
         onClose={() => setShowCelebration(false)}
       />
     </main>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={
+      <main className="relative w-full h-screen overflow-hidden bg-neutral-50 dark:bg-neutral-950 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-white mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+        </div>
+      </main>
+    }>
+      <HomeContent />
+    </Suspense>
   );
 }
