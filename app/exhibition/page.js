@@ -71,7 +71,12 @@ function ExhibitionContent() {
         <main className="relative w-full h-screen overflow-hidden bg-white">
             {/* Map Layer */}
             <div className="absolute inset-0 z-0">
-                <EventMap onEventSelect={handleEventSelect} selectMapId={"custom-svg"} completedIds={completedIds} />
+                <EventMap
+                    onEventSelect={handleEventSelect}
+                    selectMapId={"custom-svg"}
+                    completedIds={completedIds}
+                    selectedEventId={selectedEvent?.id}
+                />
             </div>
 
             {/* Email Prompt Modal - Shows if no email in params */}

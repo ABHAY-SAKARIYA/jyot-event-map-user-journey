@@ -51,12 +51,19 @@ function ZoomControls() {
     );
 }
 
-export default function EventMap({ onEventSelect, SelectedMap, selectMapId, completedIds = [] }) {
+export default function EventMap({ onEventSelect, SelectedMap, selectMapId, completedIds = [], selectedEventId }) {
     const { events, routes, mapConfig, config, loading } = useEventData(selectMapId);
-    const [selectedId, setSelectedId] = useState(null);
+    const [selectedId, setSelectedId] = useState(selectedEventId || null);
     const [isFirstTime, setIsFirstTime] = useState(false);
     const [revealedZones, setRevealedZones] = useState(new Set());
     const userDetails = useUserParams();
+
+    // Sync internal state with prop if provided (for BottomSheet Next/Prev navigation)
+    useEffect(() => {
+        if (selectedEventId !== undefined) {
+            setSelectedId(selectedEventId);
+        }
+    }, [selectedEventId]);
 
     // Check First Time Visitor
     useEffect(() => {

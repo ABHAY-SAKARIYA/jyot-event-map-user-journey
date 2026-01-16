@@ -166,8 +166,16 @@ function HomeContent() {
 
     if (isComplete && !justCompletedRef.current) {
       justCompletedRef.current = true; // Mark as completed
+
+      // If modal is NOT open, trigger immediately
+      if (!selectedEvent) {
+        setShowCelebration(true);
+        markCelebrationSeen(userId, mapConfig?.id, userEmail);
+        setHasSeenCelebration(true);
+        justCompletedRef.current = false;
+      }
     }
-  }, [completedIds, events, hasSeenCelebration]);
+  }, [completedIds, events, hasSeenCelebration, selectedEvent, userId, userEmail, mapConfig?.id]);
 
   const handleEventSelect = (event) => {
     // Audio stops when Another event is opened or Bottom sheet is closed
@@ -182,16 +190,15 @@ function HomeContent() {
     audioControl.pauseTrack();
 
     // Check if this was the last marker and user just completed journey
+    // Check if this was the last marker and user just completed journey
     console.log("Journey Completed", justCompletedRef.current, hasSeenCelebration);
     if (justCompletedRef.current && !hasSeenCelebration) {
-      // Trigger celebration after bottom sheet closes
-      setTimeout(() => {
-        setShowCelebration(true);
-        // Save celebration flag to database
-        markCelebrationSeen(userId, mapConfig?.id, userEmail);
-        setHasSeenCelebration(true);
-        justCompletedRef.current = false;
-      }, 300); // Small delay for smooth transition
+      // Trigger celebration INSTANTLY after bottom sheet closes
+      setShowCelebration(true);
+      // Save celebration flag to database
+      markCelebrationSeen(userId, mapConfig?.id, userEmail);
+      setHasSeenCelebration(true);
+      justCompletedRef.current = false;
     }
   };
 
@@ -210,7 +217,11 @@ function HomeContent() {
     <main className="relative w-full h-screen overflow-hidden bg-white">
       {/* Map Layer */}
       <div className="absolute inset-0 z-0">
-        <EventMap onEventSelect={handleEventSelect} completedIds={completedIds} />
+        <EventMap
+          onEventSelect={handleEventSelect}
+          completedIds={completedIds}
+          selectedEventId={selectedEvent?.id}
+        />
       </div>
 
       {/* Email Prompt Modal - Shows if no email in params */}
