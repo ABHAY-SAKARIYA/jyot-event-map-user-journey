@@ -65,13 +65,14 @@ export default function AdminDashboardClient({ initialRegistry }) {
             const res2 = await updateEvents(mapId, events);
             const res3 = await updateRoutes(mapId, ensureRouteIds(routes));
             const res4 = await updateBlurZones(mapId, currentMapConfig.blurZones || []);
+            const res5 = await updateCompletionMessage(mapId, currentMapConfig.completionMessage);
             console.log("Blur zones save result:", res4);
 
-            if (res1.success && res2.success && res3.success && res4.success) {
+            if (res1.success && res2.success && res3.success && res4.success && res5.success) {
                 alert("All changes saved successfully to MongoDB (Optimized)!");
             } else {
                 alert("Error saving some data. Check console.");
-                console.error("Save results:", { res1, res2, res3, res4 });
+                console.error("Save results:", { res1, res2, res3, res4, res5 });
             }
         } catch (e) {
             alert("Error saving: " + e.message);
@@ -143,7 +144,12 @@ export default function AdminDashboardClient({ initialRegistry }) {
                     )}
 
                     {activeTab === "config" && config && (
-                        <ConfigEditor config={config} onChange={setConfig} />
+                        <ConfigEditor
+                            config={config}
+                            onChange={setConfig}
+                            completionMessage={currentMapConfig?.completionMessage || ""}
+                            onMessageChange={(msg) => setCurrentMapConfig(prev => ({ ...prev, completionMessage: msg }))}
+                        />
                     )}
 
                     {activeTab === "events" && (
@@ -330,7 +336,7 @@ function MapSelector({ registry, selectedMapId, onSelectMap, onApply }) {
 
 // --- Sub-Editors (Simplified for brevity, can expand next) ---
 
-function ConfigEditor({ config, onChange }) {
+function ConfigEditor({ config, onChange, completionMessage, onMessageChange }) {
     const handleChange = (section, key, value) => {
         onChange({
             ...config,
@@ -395,9 +401,25 @@ function ConfigEditor({ config, onChange }) {
 
             {!config.ground && !config.city && (
                 <div className="text-gray-500 text-sm">
-                    No editable configuration for this map type.
+                    No editable configuration for this map type (except message).
                 </div>
             )}
+
+            {/* Completion Message Editor */}
+            <div className="space-y-3 border-t pt-4">
+                <h3 className="font-bold text-gray-900">Celebration Message</h3>
+                <div className="space-y-1">
+                    <label className="text-xs text-gray-500">
+                        Message shown when user completes all markers (supports emoji 🕵️‍♂️🎉)
+                    </label>
+                    <textarea
+                        className="border p-2 rounded w-full h-24 text-sm"
+                        value={completionMessage}
+                        onChange={(e) => onMessageChange(e.target.value)}
+                        placeholder="🎉 Congratulations! You've completed the journey..."
+                    />
+                </div>
+            </div>
         </div>
     )
 }

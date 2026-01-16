@@ -46,9 +46,9 @@ export default function EmailPromptModal({ isOpen, onClose }) {
                 >
                     <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#FA5429] to-orange-400" />
 
-                    <h2 className="text-2xl font-serif text-gray-900 mb-2 mt-2">Save Your Journey</h2>
-                    <p className="text-gray-500 text-sm mb-6">
-                        Enter your email to track your progress and resume your tour anytime.
+                    <h2 className="text-2xl font-serif text-gray-900 mb-2 mt-2">Start Your Journey Towards a Better World</h2>
+                    <p className="text-gray-500 text-m mb-6">
+                        Walk the Path. Change the World.
                     </p>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
@@ -62,6 +62,9 @@ export default function EmailPromptModal({ isOpen, onClose }) {
                                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FA5429]/20 focus:border-[#FA5429] transition-all"
                             />
                         </div>
+                        <p className="text-gray-500 text-[12px] mb-6">
+                            *Note : enter your registered email to start tour.
+                        </p>
                         <Button
                             type="submit"
                             className="w-full bg-[#FA5429] hover:bg-[#FA5429]/90 text-white py-6 text-lg rounded-xl"

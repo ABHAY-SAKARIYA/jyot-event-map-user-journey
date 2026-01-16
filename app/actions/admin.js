@@ -212,10 +212,20 @@ export async function getMapConfiguration(mapId, onlyActive = false) {
         const events = await Event.find(eventsQuery).lean();
         const routes = await Route.find({ mapId }).lean();
 
+        // Serialize mapConfig (handle _id and blurZones)
+        const serializedMapConfig = {
+            ...mapConfig,
+            _id: mapConfig._id.toString(),
+            blurZones: mapConfig.blurZones?.map(bz => ({
+                ...bz,
+                _id: bz._id ? bz._id.toString() : undefined
+            }))
+        };
+
         return {
             success: true,
             data: {
-                mapConfig: { ...mapConfig, _id: mapConfig._id.toString() },
+                mapConfig: serializedMapConfig,
                 events: events.map(e => ({ ...e, _id: e._id.toString() })),
                 routes: routes.map(r => ({ ...r, _id: r._id.toString() })),
                 config: mapConfig.config || {}

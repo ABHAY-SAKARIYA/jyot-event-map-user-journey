@@ -175,7 +175,10 @@ export default function CityMapMarker({ event, isSelected, onClick, draggable = 
                 top: `${position.y}%`,
                 x: dragX,
                 y: dragY,
-                zIndex: isSelected ? 100 : 10
+                zIndex: isSelected ? 100 : 10,
+                // backgroundColor: "red",
+                width: "10px",
+                height: "10px"
             }}
             onClick={handlePointerClick}
             onPointerDown={(e) => {
