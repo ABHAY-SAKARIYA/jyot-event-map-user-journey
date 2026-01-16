@@ -17,17 +17,15 @@ export async function saveInteraction(data) {
             userEmail, userPhone, userName
         } = data;
 
-        // Validation: Need at least userId OR userEmail
-        if ((!userId && !userEmail) || !eventId) {
-            return { success: false, error: "Missing required fields (userId or userEmail required)" };
+        // Validation: Need userEmail for tracking (as per new requirement)
+        if (!userEmail || !eventId) {
+            return { success: false, error: "Missing required fields (userEmail required)" };
         }
 
         const isCompleted = viewDuration > 5;
 
-        // Find existing record by userId OR userEmail + eventId
-        const query = { eventId };
-        if (userId) query.userId = userId;
-        else query.userEmail = userEmail;
+        // Find existing record by userEmail + eventId (Priority: Email)
+        const query = { eventId, userEmail };
 
         const existing = await Analytics.findOne(query);
 
@@ -37,11 +35,11 @@ export async function saveInteraction(data) {
             if (isCompleted) existing.completed = true;
 
             // Update metadata
-            if (userEmail) existing.userEmail = userEmail;
             if (userPhone) existing.userPhone = userPhone;
             if (userName) existing.userName = userName;
-            // if userId was missing but now present, update it? 
-            if (userId && !existing.userId) existing.userId = userId;
+
+            // Store userId if available, but don't use it for lookup
+            if (userId) existing.userId = userId;
 
             existing.timestamp = new Date();
             await existing.save();
@@ -69,7 +67,8 @@ export async function getUserProgress(userId, mapId, userEmail) {
     try {
         await dbConnect();
 
-        if (!userId && !userEmail) return { success: false, error: "UserID or Email required" };
+        // STRICTLY use userEmail for tracking
+        if (!userEmail) return { success: false, error: "User Email required for progress" };
 
         const query = { status: "Active" };
         if (mapId) {
@@ -79,13 +78,8 @@ export async function getUserProgress(userId, mapId, userEmail) {
         // 1. Get all active events for this map
         const events = await Event.find(query).select("id group title category mapId").lean();
 
-        // 2. Get all completed interactions for this user (by ID or Email)
-        const analyticsQuery = { completed: true };
-        if (userId) {
-            analyticsQuery.userId = userId;
-        } else {
-            analyticsQuery.userEmail = userEmail;
-        }
+        // 2. Get all completed interactions for this user (by Email ONLY)
+        const analyticsQuery = { completed: true, userEmail: userEmail };
 
         const interactions = await Analytics.find(analyticsQuery).select("eventId").lean();
 
@@ -130,19 +124,19 @@ export async function checkFirstTimeVisitor(userId, mapId, userEmail) {
     try {
         await dbConnect();
 
-        if (!userId && !userEmail) return { success: false, isFirstTime: true }; // Default to true if unknown
+        // If no email, treat as new visitor (safest default)
+        if (!userEmail) return { success: false, isFirstTime: true };
 
         // Check if ANY analytics exist for this user on this map
         const events = await Event.find({ mapId }).select("_id id").lean();
         const mapEventIds = events.map(e => e.id);
 
+        // Query by Email Only
         const query = {
             eventId: { $in: mapEventIds },
-            completed: true
+            completed: true,
+            userEmail: userEmail
         };
-
-        if (userId) query.userId = userId;
-        else query.userEmail = userEmail;
 
         const existing = await Analytics.exists(query);
 
@@ -213,7 +207,7 @@ export async function checkHasSeenCelebration(userId, mapId, userEmail) {
     try {
         await dbConnect();
 
-        if (!userId && !userEmail) {
+        if (!userEmail) {
             return { success: false, hasSeenCelebration: false };
         }
 
@@ -223,11 +217,9 @@ export async function checkHasSeenCelebration(userId, mapId, userEmail) {
 
         const query = {
             eventId: { $in: eventIds },
-            hasSeenCelebration: true
+            hasSeenCelebration: true,
+            userEmail: userEmail
         };
-
-        if (userId) query.userId = userId;
-        else query.userEmail = userEmail;
 
         const record = await Analytics.findOne(query);
 
@@ -248,8 +240,8 @@ export async function markCelebrationSeen(userId, mapId, userEmail) {
     try {
         await dbConnect();
 
-        if (!userId && !userEmail) {
-            return { success: false, error: "User identification required" };
+        if (!userEmail) {
+            return { success: false, error: "User Email required" };
         }
 
         // Update ALL analytics records for this user on this map
@@ -257,11 +249,9 @@ export async function markCelebrationSeen(userId, mapId, userEmail) {
         const eventIds = events.map(e => e.id);
 
         const query = {
-            eventId: { $in: eventIds }
+            eventId: { $in: eventIds },
+            userEmail: userEmail
         };
-
-        if (userId) query.userId = userId;
-        else query.userEmail = userEmail;
 
         await Analytics.updateMany(
             query,
