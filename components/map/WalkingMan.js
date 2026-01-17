@@ -23,7 +23,7 @@ export default function WalkingMan({ position, label = "YOU", offset = { x: -0.5
             }}
         >
             <div className="relative -translate-x-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center">
-                <span className="text-3xl filter drop-shadow-md">👱‍♂️</span>
+                <span className="text-3xl filter drop-shadow-md">👱🏻‍♂️</span>
                 <div className="absolute -top-4 whitespace-nowrap bg-black text-white text-[8px] px-1 rounded font-bold uppercase tracking-widest">
                     {label}
                 </div>

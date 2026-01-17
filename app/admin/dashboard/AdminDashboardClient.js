@@ -461,6 +461,16 @@ function EventsEditor({ events, onChange }) {
                         </button>
                     </div>
 
+                    {/* Marker Title (Short) */}
+                    <div className="mb-2">
+                        <input
+                            className="text-xs border-b border-transparent hover:border-gray-300 focus:border-black outline-none w-full text-gray-600"
+                            value={event.markerTitle || ''}
+                            onChange={(e) => updateEvent(idx, 'markerTitle', e.target.value)}
+                            placeholder="Marker Title (Optional - overrides Title on map)"
+                        />
+                    </div>
+
                     {/* Basic Info - Always Visible */}
                     <div className="grid grid-cols-2 gap-2 text-xs mb-2">
                         <label className="flex flex-col">

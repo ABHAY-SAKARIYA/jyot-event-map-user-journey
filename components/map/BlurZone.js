@@ -44,7 +44,7 @@ export default function BlurZone({ zone, onReveal, isRevealed }) {
                     >
                         {/* The Blur Effect */}
                         <div
-                            className="absolute inset-0 backdrop-blur-md bg-white/10 border border-white/20 shadow-xl rounded-2xl cursor-pointer transition-all hover:bg-white/20 hover:backdrop-blur-lg"
+                            className="absolute inset-0 backdrop-blur-xl bg-white/10 border border-white/20 shadow-xl rounded-2xl cursor-pointer transition-all hover:bg-white/20 hover:backdrop-blur-lg"
                             onClick={handleInteraction}
                         >
                             {/* Stripes pattern overlay for better visibility of blur area */}

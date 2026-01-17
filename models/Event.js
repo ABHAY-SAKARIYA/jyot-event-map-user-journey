@@ -23,6 +23,7 @@ const EventSchema = new mongoose.Schema({
     youtubeUrl: { type: String },
     group: { type: String },
     order: { type: Number },
+    markerTitle: { type: String }, // Optional short title for the map marker
     openModal: { type: Boolean, default: true },
 }, { timestamps: true });
 

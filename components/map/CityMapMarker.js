@@ -255,21 +255,24 @@ export default function CityMapMarker({ event, isSelected, onClick, draggable = 
                 {/* 1. The Label Pill */}
                 <motion.div
                     className={cn(
-                        "relative mb-1 px-3 py-1.5 bg-white rounded-lg shadow-lg border border-gray-200 flex items-center gap-2 min-w-max transition-all pointer-events-auto",
-                        isSelected ? "ring-2 ring-black scale-105" : "opacity-95",
+                        "relative mb-1 px-3 py-1.5 bg-white rounded-lg shadow-lg border border-gray-200 flex items-center justify-center gap-2 max-w-[160px] transition-all pointer-events-auto",
+                        isSelected ? "ring-2 ring-[#FA5429] scale-105" : "opacity-95",
                         isViewed && !isSelected && "border-green-500/50 bg-green-50"
                     )}
                     initial={{ y: 5 }}
                     animate={{ y: 0 }}
                 >
-                    <span className="text-sm leading-none" role="img" aria-label="icon">
-                        {iconType === 'emoji' ? icon : '📍'}
-                    </span>
+                    {
+                        icon && iconType === 'emoji' &&
+                        <span className="text-sm leading-none shrink-0" role="img" aria-label="icon">
+                            {icon}
+                        </span>
+                    }
                     <span className={cn(
-                        "text-xs font-bold font-sans tracking-wide uppercase",
+                        "text-[8px] font-bold font-sans tracking-wide camelcase text-center leading-tight break-words",
                         isViewed ? "text-green-700" : "text-gray-800"
                     )}>
-                        {title}
+                        {event.markerTitle || title}
                     </span>
                     <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white rotate-45 border-b border-r border-gray-200" />
                 </motion.div>

@@ -28,7 +28,6 @@ export default function CustomSvgBackground({
             <SvgContainer
                 viewBox={viewBox}
                 padding={padding}
-                preserveAspectRatio="xMidYMid meet"
                 {...props}
             >
                 {children}

@@ -133,7 +133,7 @@ export default function BottomSheet({ event, allEvents = [], isOpen, onClose, au
                         exit={{ y: "110%" }}
                         transition={{ type: "spring", damping: 28, stiffness: 300 }}
                         className="fixed z-50 bg-white shadow-[0_-10px_40px_-5px_rgba(0,0,0,0.1)] 
-                       w-full max-h-[85vh] h-auto flex flex-col bottom-0 left-0 rounded-t-[32px] overflow-hidden
+                       w-full h-[100dvh] flex flex-col bottom-0 left-0 overflow-hidden
                        md:max-w-md md:h-auto md:max-h-[90vh] md:bottom-6 md:left-auto md:right-6 md:rounded-[32px] md:border md:border-gray-200"
                     >
                         {/* Drag Handle (Mobile) */}
