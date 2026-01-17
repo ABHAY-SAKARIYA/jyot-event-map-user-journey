@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 
 // Default fallbacks
 const DEFAULT_MIN_ZOOM = 2;
-const MAX_ZOOM = 4;
+const MAX_ZOOM = 8;
 
 export function useMapGestures() {
     const x = useMotionValue(0);
@@ -24,7 +24,7 @@ export function useMapGestures() {
         // Responsive Logic
         const handleResize = () => {
             const isMobile = window.innerWidth < 768;
-            const targetBaseScale = 2;
+            const targetBaseScale = isMobile ? 3 : 1.9;
 
             // Set the minimum zoom limit
             setMinZoom(targetBaseScale);

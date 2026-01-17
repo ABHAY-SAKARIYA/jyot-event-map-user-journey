@@ -128,7 +128,7 @@ export default function CityMapMarker({ event, isSelected, onClick, draggable = 
     const { position, title, color, category, icon, iconType } = event;
     const { scale } = useMapState();
 
-    const markerScale = useTransform(scale, s => Math.max(1 / s, 1));
+    const markerScale = useTransform(scale, s => 2 / s);
 
     // Motion values to handle drag transforms and reset them on end
     const dragX = useMotionValue(0);
@@ -255,7 +255,7 @@ export default function CityMapMarker({ event, isSelected, onClick, draggable = 
                 {/* 1. The Label Pill */}
                 <motion.div
                     className={cn(
-                        "relative mb-0 px-1 py-1.5 bg-white rounded-lg shadow-lg border border-gray-200 flex items-center justify-center gap-2 max-w-[160px] transition-all pointer-events-auto",
+                        "relative mb-0 px-1 py-1.5 bg-white rounded-lg shadow-lg border border-gray-200 flex items-center justify-center gap-2 w-max max-w-[80px] transition-all pointer-events-auto",
                         isSelected ? "ring-2 ring-[#FA5429] scale-105" : "opacity-95",
                         isViewed && !isSelected && "border-green-500/50 bg-green-50"
                     )}
