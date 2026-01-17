@@ -29,10 +29,10 @@ export default function MapCanvas({ children, className, controls }) {
             const h = window.innerHeight;
             // Larger constraints allow "overscroll" feeling so you never feel stuck
             setConstraints({
-                left: -w * 1.5,
-                right: w * 1.5,
-                top: -h * 1.5,
-                bottom: h * 1.5
+                left: -w * 3,
+                right: w * 3,
+                top: -h * 1,
+                bottom: h * 1
             });
         };
 

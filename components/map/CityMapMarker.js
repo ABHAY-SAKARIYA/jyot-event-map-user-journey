@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 // --- Predefined Map Structures (Clean, Isometric-ish, Professional) ---
 const Structures = {
     Dome: (color) => (
-        <svg viewBox="0 0 24 24" className="w-16 h-16 fill-current drop-shadow-sm" style={{ color }}>
+        <svg viewBox="0 0 24 24" className="w-10 h-10 fill-current drop-shadow-sm" style={{ color }}>
             {/* Simple Clean Semi-Circle Dome */}
             <path d="M2,18 L22,18 L22,20 L2,20 Z" fillOpacity="0.8" /> {/* Base */}
             <path d="M12,4 C17,4 21,12 21,18 L3,18 C3,12 7,4 12,4 Z" fillOpacity="0.9" /> {/* Dome */}
@@ -17,7 +17,7 @@ const Structures = {
         </svg>
     ),
     Tent: (color) => (
-        <svg viewBox="0 0 24 24" className="w-16 h-16 fill-current drop-shadow-sm" style={{ color }}>
+        <svg viewBox="0 0 24 24" className="w-10 h-10 fill-current drop-shadow-sm" style={{ color }}>
             {/* Clean Event Tent */}
             <path d="M12,3 L2,15 L2,20 L22,20 L22,15 L12,3 Z" fillOpacity="0.9" />
             <path d="M12,3 L12,20" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" /> {/* Center Pole line */}
@@ -25,7 +25,7 @@ const Structures = {
         </svg>
     ),
     Stage: (color) => (
-        <svg viewBox="0 0 24 24" className="w-20 h-14 fill-current drop-shadow-sm" style={{ color }}>
+        <svg viewBox="0 0 24 24" className="w-12 h-9 fill-current drop-shadow-sm" style={{ color }}>
             {/* Rectangular Stage Structure */}
             <rect x="2" y="10" width="20" height="8" rx="1" fillOpacity="0.9" />
             <path d="M4,10 L8,5 L16,5 L20,10" fillOpacity="0.6" /> {/* Roof/Truss */}
@@ -33,7 +33,7 @@ const Structures = {
         </svg>
     ),
     Building: (color) => (
-        <svg viewBox="0 0 24 24" className="w-12 h-16 fill-current drop-shadow-sm" style={{ color }}>
+        <svg viewBox="0 0 24 24" className="w-7 h-7 fill-current drop-shadow-sm" style={{ color }}>
             {/* Minimalist Tower */}
             <path d="M6,22 L18,22 L18,6 L6,6 L6,22 Z" fillOpacity="0.9" />
             <path d="M6,6 L12,2 L18,6" fillOpacity="0.7" /> {/* Roof */}
@@ -44,7 +44,7 @@ const Structures = {
         </svg>
     ),
     Entry: (color) => (
-        <svg viewBox="0 0 24 24" className="w-16 h-16 fill-current drop-shadow-sm" style={{ color }}>
+        <svg viewBox="0 0 24 24" className="w-10 h-10 fill-current drop-shadow-sm" style={{ color }}>
             {/* Gate / Entry Archetype */}
             <path d="M4,20 L4,8 L12,4 L20,8 L20,20" fill="none" stroke="currentColor" strokeWidth="2" />
             <path d="M7,20 L7,12 Q12,10 17,12 L17,20" fillOpacity="0.3" />
@@ -52,32 +52,32 @@ const Structures = {
         </svg>
     ),
     Exit: (color) => (
-        <svg viewBox="0 0 24 24" className="w-16 h-16 fill-current drop-shadow-sm" style={{ color: '#ef4444' }}>
+        <svg viewBox="0 0 24 24" className="w-10 h-10 fill-current drop-shadow-sm" style={{ color: '#ef4444' }}>
             <path d="M4,20 L4,8 L12,4 L20,8 L20,20" fill="none" stroke="currentColor" strokeWidth="2" />
             <path d="M7,20 L7,12 Q12,10 17,12 L17,20" fillOpacity="0.3" />
             <text x="12" y="16" fontSize="5" textAnchor="middle" fill="white" fontWeight="bold">EXIT</text>
         </svg>
     ),
     Medical: (color) => (
-        <svg viewBox="0 0 24 24" className="w-14 h-14 fill-current drop-shadow-sm" style={{ color }}>
+        <svg viewBox="0 0 24 24" className="w-8 h-8 fill-current drop-shadow-sm" style={{ color }}>
             <rect x="4" y="4" width="16" height="16" rx="2" fillOpacity="0.9" />
             <path d="M12,8 L12,16 M8,12 L16,12" stroke="white" strokeWidth="3" strokeLinecap="round" />
         </svg>
     ),
     Info: (color) => (
-        <svg viewBox="0 0 24 24" className="w-14 h-14 fill-current drop-shadow-sm" style={{ color }}>
+        <svg viewBox="0 0 24 24" className="w-8 h-8 fill-current drop-shadow-sm" style={{ color }}>
             <circle cx="12" cy="12" r="10" fillOpacity="0.9" />
             <path d="M12,16 L12,11 M12,8 L12,8.01" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
         </svg>
     ),
     Parking: (color) => (
-        <svg viewBox="0 0 24 24" className="w-14 h-14 fill-current drop-shadow-sm" style={{ color }}>
+        <svg viewBox="0 0 24 24" className="w-8 h-8 fill-current drop-shadow-sm" style={{ color }}>
             <rect x="4" y="4" width="16" height="16" rx="2" fillOpacity="0.9" />
             <text x="12" y="15.5" fontSize="12" textAnchor="middle" fill="white" fontWeight="900" fontFamily="sans-serif">P</text>
         </svg>
     ),
     Restroom: (color) => (
-        <svg viewBox="0 0 24 24" className="w-14 h-14 fill-current drop-shadow-sm" style={{ color }}>
+        <svg viewBox="0 0 24 24" className="w-8 h-8 fill-current drop-shadow-sm" style={{ color }}>
             <rect x="4" y="4" width="16" height="16" rx="2" fillOpacity="0.9" />
             <circle cx="9" cy="9" r="1.5" fill="white" />
             <path d="M7.5,12 L10.5,12 L10.5,16 L7.5,16 Z" fill="white" />
@@ -87,32 +87,32 @@ const Structures = {
         </svg>
     ),
     Shop: (color) => (
-        <svg viewBox="0 0 24 24" className="w-14 h-14 fill-current drop-shadow-sm" style={{ color }}>
+        <svg viewBox="0 0 24 24" className="w-8 h-8 fill-current drop-shadow-sm" style={{ color }}>
             <path d="M6,8 L18,8 L19,20 L5,20 Z" fillOpacity="0.9" />
             <path d="M9,10 Q9,4 12,4 Q15,4 15,10" fill="none" stroke="currentColor" strokeWidth="1.5" />
         </svg>
     ),
     Workshop: (color) => (
-        <svg viewBox="0 0 24 24" className="w-14 h-14 fill-current drop-shadow-sm" style={{ color }}>
+        <svg viewBox="0 0 24 24" className="w-8 h-8 fill-current drop-shadow-sm" style={{ color }}>
             <path d="M12,2 L14.5,4.5 L17,4 L17.5,6.5 L20,7 L19.5,9.5 L22,12 L19.5,14.5 L20,17 L17.5,17.5 L17,20 L14.5,19.5 L12,22 L9.5,19.5 L7,20 L6.5,17.5 L4,17 L4.5,14.5 L2,12 L4.5,9.5 L4,7 L6.5,6.5 L7,4 L9.5,4.5 Z" fillOpacity="0.9" />
             <circle cx="12" cy="12" r="3" fill="white" fillOpacity="0.3" />
         </svg>
     ),
     Cafe: (color) => (
-        <svg viewBox="0 0 24 24" className="w-14 h-14 fill-current drop-shadow-sm" style={{ color }}>
+        <svg viewBox="0 0 24 24" className="w-8 h-8 fill-current drop-shadow-sm" style={{ color }}>
             <path d="M5,8 L17,8 L16,18 L6,18 Z" fillOpacity="0.9" />
             <path d="M17,10 Q21,10 21,13 Q21,16 17,16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             <path d="M8,5 L8,7 M11,5 L11,7 M14,5 L14,7" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
         </svg>
     ),
     Security: (color) => (
-        <svg viewBox="0 0 24 24" className="w-14 h-14 fill-current drop-shadow-sm" style={{ color }}>
+        <svg viewBox="0 0 24 24" className="w-8 h-8 fill-current drop-shadow-sm" style={{ color }}>
             <path d="M12,2 L4,5 L4,11 Q4,17 12,22 Q20,17 20,11 L20,5 Z" fillOpacity="0.9" />
             <path d="M12,7 L12,15 M9,12 L15,12" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
     ),
     Theater: (color) => (
-        <svg viewBox="0 0 24 24" className="w-16 h-14 fill-current drop-shadow-sm" style={{ color }}>
+        <svg viewBox="0 0 24 24" className="w-10 h-9 fill-current drop-shadow-sm" style={{ color }}>
             {/* Minimalist Mask style */}
             <path d="M2,10 Q2,4 8,4 Q14,4 14,10 Q14,16 8,16 Q2,16 2,10 Z" fillOpacity="0.8" transform="translate(0, 0) rotate(-10 8 10)" />
             <path d="M10,10 Q10,4 16,4 Q22,4 22,10 Q22,16 16,16 Q10,16 10,10 Z" fillOpacity="0.6" transform="translate(0, 2) rotate(10 16 10)" />
@@ -255,7 +255,7 @@ export default function CityMapMarker({ event, isSelected, onClick, draggable = 
                 {/* 1. The Label Pill */}
                 <motion.div
                     className={cn(
-                        "relative mb-1 px-3 py-1.5 bg-white rounded-lg shadow-lg border border-gray-200 flex items-center justify-center gap-2 max-w-[160px] transition-all pointer-events-auto",
+                        "relative mb-0 px-1 py-1.5 bg-white rounded-lg shadow-lg border border-gray-200 flex items-center justify-center gap-2 max-w-[160px] transition-all pointer-events-auto",
                         isSelected ? "ring-2 ring-[#FA5429] scale-105" : "opacity-95",
                         isViewed && !isSelected && "border-green-500/50 bg-green-50"
                     )}
@@ -264,12 +264,12 @@ export default function CityMapMarker({ event, isSelected, onClick, draggable = 
                 >
                     {
                         icon && iconType === 'emoji' &&
-                        <span className="text-sm leading-none shrink-0" role="img" aria-label="icon">
+                        <span className="text-[5px] leading-none shrink-0" role="img" aria-label="icon">
                             {icon}
                         </span>
                     }
                     <span className={cn(
-                        "text-[8px] font-bold font-sans tracking-wide camelcase text-center leading-tight break-words",
+                        "text-[5px] font-bold font-sans tracking-wide camelcase text-center leading-tight break-words",
                         isViewed ? "text-green-700" : "text-gray-800"
                     )}>
                         {event.markerTitle || title}
@@ -283,7 +283,7 @@ export default function CityMapMarker({ event, isSelected, onClick, draggable = 
                 </div>
 
                 {/* 3. Shadow */}
-                <div className="absolute -bottom-1 w-8 h-2 bg-black/10 rounded-[100%] z-0" />
+                <div className="absolute -bottom-1 w-5 h-1 bg-black/10 rounded-[100%] z-0" />
             </motion.div>
         </motion.div>
     );
