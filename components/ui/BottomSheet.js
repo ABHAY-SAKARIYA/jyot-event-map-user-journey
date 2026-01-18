@@ -8,11 +8,14 @@ import { useEffect, useRef, useState, useMemo, memo } from "react";
 import { saveInteraction } from "@/app/actions/analytics";
 import { useUserParams } from "@/hooks/useUserParams";
 
-export default function BottomSheet({ event, allEvents = [], isOpen, onClose, audioControl, onInteractionComplete, onSwitchEvent }) {
+export default function BottomSheet({ event, allEvents = [], isOpen, onClose, audioControl, onInteractionComplete, onSwitchEvent, enableLanguageToggle = true }) {
+    // Language State
+    const [currentLanguage, setCurrentLanguage] = useState('en'); // 'en' or 'hin'
+
     // Analytics Refs
     const startTimeRef = useRef(Date.now());
     const audioStartTimeRef = useRef(null);
-    const audioDurationRef = useRef(0);
+    const audioDurationRef = useRef({ en: 0, hin: 0 }); // Separate tracking
     const hasSavedRef = useRef(false);
 
     // Get User Params
@@ -21,12 +24,13 @@ export default function BottomSheet({ event, allEvents = [], isOpen, onClose, au
     // Audio Autoplay & Tracking
     useEffect(() => {
         if (isOpen && event?.audio) {
+            setCurrentLanguage('en'); // Reset to English on open
             audioControl.playTrack(event.audio);
         }
 
         // Reset tracking on open/event change
         startTimeRef.current = Date.now();
-        audioDurationRef.current = 0;
+        audioDurationRef.current = { en: 0, hin: 0 };
         audioStartTimeRef.current = null;
         hasSavedRef.current = false;
 
@@ -35,18 +39,18 @@ export default function BottomSheet({ event, allEvents = [], isOpen, onClose, au
         };
     }, [isOpen, event?.id]);
 
-    // Track Audio Duration
+    // Track Audio Duration (Language-specific)
     useEffect(() => {
         if (audioControl.isPlaying) {
             audioStartTimeRef.current = Date.now();
         } else {
             if (audioStartTimeRef.current) {
                 const session = (Date.now() - audioStartTimeRef.current) / 1000;
-                audioDurationRef.current += session;
+                audioDurationRef.current[currentLanguage] += session;
                 audioStartTimeRef.current = null;
             }
         }
-    }, [audioControl.isPlaying]);
+    }, [audioControl.isPlaying, currentLanguage]);
 
     // Save Analytics Handler
     const handleSaveAnalytics = async () => {
@@ -56,9 +60,16 @@ export default function BottomSheet({ event, allEvents = [], isOpen, onClose, au
         const viewDuration = (endTime - startTimeRef.current) / 1000;
 
         // Add current audio session if still playing
-        let totalAudio = audioDurationRef.current;
+        let totalAudioEn = audioDurationRef.current.en;
+        let totalAudioHin = audioDurationRef.current.hin;
+
         if (audioControl.isPlaying && audioStartTimeRef.current) {
-            totalAudio += (endTime - audioStartTimeRef.current) / 1000;
+            const currentSession = (endTime - audioStartTimeRef.current) / 1000;
+            if (currentLanguage === 'en') {
+                totalAudioEn += currentSession;
+            } else {
+                totalAudioHin += currentSession;
+            }
         }
 
         // Save if viewed for more than 5 seconds
@@ -69,7 +80,8 @@ export default function BottomSheet({ event, allEvents = [], isOpen, onClose, au
                 ...userDetails,
                 eventId: event.id,
                 viewDuration,
-                audioListenDuration: totalAudio
+                audioListenDuration: totalAudioEn,
+                audioListenDuration_hin: totalAudioHin
             });
             if (onInteractionComplete) onInteractionComplete();
         }
@@ -88,6 +100,26 @@ export default function BottomSheet({ event, allEvents = [], isOpen, onClose, au
         onClose();
     };
 
+    // Language Toggle Handler
+    const handleLanguageToggle = () => {
+        // Save current audio session before switching
+        if (audioStartTimeRef.current) {
+            const session = (Date.now() - audioStartTimeRef.current) / 1000;
+            audioDurationRef.current[currentLanguage] += session;
+            audioStartTimeRef.current = null;
+        }
+
+        // Toggle language
+        const newLanguage = currentLanguage === 'en' ? 'hin' : 'en';
+        setCurrentLanguage(newLanguage);
+
+        // Switch audio and restart playback
+        const newAudioUrl = newLanguage === 'en' ? event.audio : event.audio_hin;
+        if (newAudioUrl) {
+            audioControl.playTrack(newAudioUrl);
+        }
+    };
+
     // Navigation Logic
     const sortedEvents = useMemo(() => {
         return [...allEvents].sort((a, b) => (a.order || 999) - (b.order || 999));
@@ -102,7 +134,9 @@ export default function BottomSheet({ event, allEvents = [], isOpen, onClose, au
 
     if (!event) return null;
 
-    const isAudioPlaying = audioControl.isPlaying && audioControl.currentTrack === event.audio;
+    // Check if current language's audio is playing
+    const currentAudioUrl = currentLanguage === 'en' ? event.audio : event.audio_hin;
+    const isAudioPlaying = audioControl.isPlaying && audioControl.currentTrack === currentAudioUrl;
 
     const getYoutubeId = (url) => {
         if (!url) return null;
@@ -200,12 +234,27 @@ export default function BottomSheet({ event, allEvents = [], isOpen, onClose, au
                                             <Play className="w-24 h-24 text-black" />
                                         </div>
                                         <div className="relative z-10">
-                                            <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Audio Guide</h4>
+                                            <div className="flex items-center justify-between mb-4">
+                                                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Audio Guide</h4>
+                                                {/* Language Toggle - Only show if Hindi audio available and feature enabled */}
+                                                {enableLanguageToggle && event.audio_hin && (
+                                                    <button
+                                                        onClick={handleLanguageToggle}
+                                                        className="px-3 py-1.5 bg-white
+                                                        border border-gray-200 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-md transition-colors flex items-center gap-1.5"
+                                                    >
+                                                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                                        </svg>
+                                                        Switch to {currentLanguage === 'en' ? 'हिंदी' : 'English'}
+                                                    </button>)
+                                                }
+                                            </div>
                                             <h3 className="text-xl font-serif text-gray-900 mb-4">Voice of the {event.title}</h3>
 
                                             <div className="flex items-center gap-4">
                                                 <button
-                                                    onClick={() => audioControl.playTrack(event.audio)}
+                                                    onClick={() => audioControl.playTrack(currentLanguage === 'en' ? event.audio : event.audio_hin)}
                                                     className="w-12 h-12 flex items-center justify-center bg-[#FA5429] text-white rounded-full hover:scale-105 active:scale-95 transition-transform shadow-lg shadow-orange-200 shrink-0"
                                                 >
                                                     {isAudioPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-1" />}

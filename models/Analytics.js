@@ -9,7 +9,8 @@ const AnalyticsSchema = new mongoose.Schema({
     eventId: { type: String, required: true, index: true }, // Event ID
 
     viewDuration: { type: Number, default: 0 }, // Seconds
-    audioListenDuration: { type: Number, default: 0 }, // Seconds
+    audioListenDuration: { type: Number, default: 0 }, // Seconds (English audio)
+    audioListenDuration_hin: { type: Number, default: 0 }, // Seconds (Hindi audio)
 
     completed: { type: Boolean, default: false }, // If viewDuration > 5s
     timestamp: { type: Date, default: Date.now },

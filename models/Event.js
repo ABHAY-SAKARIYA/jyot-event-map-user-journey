@@ -16,6 +16,7 @@ const EventSchema = new mongoose.Schema({
     description: { type: String },
     banner: { type: String },
     audio: { type: String },
+    audio_hin: { type: String }, // Hindi audio URL
     location: { type: String },
     status: { type: String },
     onClickType: { type: String, enum: ['link', 'action'], default: 'link' },

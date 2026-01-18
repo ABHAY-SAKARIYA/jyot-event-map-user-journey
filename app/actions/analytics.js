@@ -13,7 +13,7 @@ export async function saveInteraction(data) {
 
         const {
             userId, eventId,
-            viewDuration, audioListenDuration,
+            viewDuration, audioListenDuration, audioListenDuration_hin,
             userEmail, userPhone, userName
         } = data;
 
@@ -31,7 +31,8 @@ export async function saveInteraction(data) {
 
         if (existing) {
             existing.viewDuration = (existing.viewDuration || 0) + viewDuration;
-            existing.audioListenDuration = (existing.audioListenDuration || 0) + audioListenDuration;
+            existing.audioListenDuration = (existing.audioListenDuration || 0) + (audioListenDuration || 0);
+            existing.audioListenDuration_hin = (existing.audioListenDuration_hin || 0) + (audioListenDuration_hin || 0);
             if (isCompleted) existing.completed = true;
 
             // Update metadata
@@ -47,7 +48,8 @@ export async function saveInteraction(data) {
             await Analytics.create({
                 userId, eventId,
                 viewDuration,
-                audioListenDuration,
+                audioListenDuration: audioListenDuration || 0,
+                audioListenDuration_hin: audioListenDuration_hin || 0,
                 completed: isCompleted,
                 userEmail, userPhone, userName
             });

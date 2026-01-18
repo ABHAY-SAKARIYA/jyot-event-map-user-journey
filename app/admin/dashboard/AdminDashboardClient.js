@@ -544,9 +544,16 @@ function EventsEditor({ events, onChange }) {
                             </label>
 
                             <label className="flex flex-col text-xs">
-                                <span className="text-gray-500 mb-1">Audio URL</span>
+                                <span className="text-gray-500 mb-1">Audio URL (English)</span>
                                 <input className="border p-1 rounded text-xs" value={event.audio || ''}
                                     onChange={e => updateEvent(idx, 'audio', e.target.value)} />
+                            </label>
+
+                            <label className="flex flex-col text-xs">
+                                <span className="text-gray-500 mb-1">Audio URL (Hindi) - Optional</span>
+                                <input className="border p-1 rounded text-xs" value={event.audio_hin || ''}
+                                    onChange={e => updateEvent(idx, 'audio_hin', e.target.value)}
+                                    placeholder="Hindi audio URL (optional)" />
                             </label>
 
                             <label className="flex flex-col text-xs">
