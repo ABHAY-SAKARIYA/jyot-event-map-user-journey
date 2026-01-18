@@ -109,12 +109,12 @@ export default function CelebrationModal({ isOpen, message, onClose }) {
 
                                 {/* Action Buttons */}
                                 <div className="space-y-3">
-                                    <button
+                                    {/* <button
                                         onClick={handleStartQuiz}
                                         className="w-full py-4 bg-[#FA5429] text-white rounded-2xl font-bold text-lg hover:bg-[#E94A23] transition-colors active:scale-95 shadow-lg shadow-orange-200"
                                     >
                                         Start Quiz
-                                    </button>
+                                    </button> */}
 
                                     <button
                                         onClick={onClose}
