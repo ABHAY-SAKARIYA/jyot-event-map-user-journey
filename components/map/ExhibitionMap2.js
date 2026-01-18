@@ -14,7 +14,7 @@ export default function ExhibitionMap2() {
             backgroundColor="#f0f4f8"
         >
             <image
-                href="/image/exhibitionmapfinal2.jpg"
+                href="/image/exhibitionmap2-resize.jpg"
                 x="0"
                 y="0"
                 width="1000"
