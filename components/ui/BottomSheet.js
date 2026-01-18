@@ -189,42 +189,46 @@ export default function BottomSheet({ event, allEvents = [], isOpen, onClose, au
                                 </div>
 
                                 {/* Audio Player Card */}
-                                <div className="relative bg-gray-50 border border-gray-100 rounded-2xl p-5 overflow-hidden group shadow-sm">
-                                    <div className="absolute top-0 right-0 p-3 opacity-5">
-                                        <Play className="w-24 h-24 text-black" />
-                                    </div>
 
-                                    <div className="relative z-10">
-                                        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Audio Guide</h4>
-                                        <h3 className="text-xl font-serif text-gray-900 mb-4">Voice of the {event.title}</h3>
+                                {
+                                    event.audio &&
+                                    <div className="relative bg-gray-50 border border-gray-100 rounded-2xl p-5 overflow-hidden group shadow-sm">
+                                        <div className="absolute top-0 right-0 p-3 opacity-5">
+                                            <Play className="w-24 h-24 text-black" />
+                                        </div>
+                                        <div className="relative z-10">
+                                            <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Audio Guide</h4>
+                                            <h3 className="text-xl font-serif text-gray-900 mb-4">Voice of the {event.title}</h3>
 
-                                        <div className="flex items-center gap-4">
-                                            <button
-                                                onClick={() => audioControl.playTrack(event.audio)}
-                                                className="w-12 h-12 flex items-center justify-center bg-[#FA5429] text-white rounded-full hover:scale-105 active:scale-95 transition-transform shadow-lg shadow-orange-200 shrink-0"
-                                            >
-                                                {isAudioPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-1" />}
-                                            </button>
+                                            <div className="flex items-center gap-4">
+                                                <button
+                                                    onClick={() => audioControl.playTrack(event.audio)}
+                                                    className="w-12 h-12 flex items-center justify-center bg-[#FA5429] text-white rounded-full hover:scale-105 active:scale-95 transition-transform shadow-lg shadow-orange-200 shrink-0"
+                                                >
+                                                    {isAudioPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-1" />}
+                                                </button>
 
-                                            {/* Interactive Waveform & Time */}
-                                            <div className="flex-1 flex flex-col justify-center">
-                                                <InteractiveWaveform
-                                                    isPlaying={isAudioPlaying}
-                                                    progress={audioControl.progress}
-                                                    onSeek={audioControl.seek}
-                                                />
-                                                <div className="flex justify-between mt-1 px-1">
-                                                    <span className="text-[10px] items-center text-gray-400 font-mono font-medium">
-                                                        {formatTime(audioControl.currentTime || 0)}
-                                                    </span>
-                                                    <span className="text-[10px] items-center text-gray-400 font-mono font-medium">
-                                                        {formatTime(audioControl.duration || 0)}
-                                                    </span>
+                                                {/* Interactive Waveform & Time */}
+                                                <div className="flex-1 flex flex-col justify-center">
+                                                    <InteractiveWaveform
+                                                        isPlaying={isAudioPlaying}
+                                                        progress={audioControl.progress}
+                                                        onSeek={audioControl.seek}
+                                                    />
+                                                    <div className="flex justify-between mt-1 px-1">
+                                                        <span className="text-[10px] items-center text-gray-400 font-mono font-medium">
+                                                            {formatTime(audioControl.currentTime || 0)}
+                                                        </span>
+                                                        <span className="text-[10px] items-center text-gray-400 font-mono font-medium">
+                                                            {formatTime(audioControl.duration || 0)}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
+
                                     </div>
-                                </div>
+                                }
 
                                 {/* YouTube Embed */}
                                 {youtubeId && (
