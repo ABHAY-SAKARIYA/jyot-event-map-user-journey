@@ -2,7 +2,7 @@
 "use client";
 
 import { motion, useTransform, useMotionValue } from "framer-motion";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, memo } from "react";
 import { useMapState } from "./MapCanvas";
 import { cn } from "@/lib/utils";
 
@@ -124,7 +124,7 @@ const Structures = {
     )
 };
 
-export default function CityMapMarker({ event, isSelected, onClick, draggable = false, onDragEnd, isViewed }) {
+function CityMapMarker({ event, isSelected, onClick, draggable = false, onDragEnd, isViewed }) {
     const { position, title, color, category, icon, iconType } = event;
     const { scale } = useMapState();
 
@@ -288,3 +288,19 @@ export default function CityMapMarker({ event, isSelected, onClick, draggable = 
         </motion.div>
     );
 }
+
+// Memoize to prevent re-renders when parent updates but this marker's props haven't changed
+export default memo(CityMapMarker, (prevProps, nextProps) => {
+    return (
+        prevProps.event.id === nextProps.event.id &&
+        prevProps.event.position.x === nextProps.event.position.x &&
+        prevProps.event.position.y === nextProps.event.position.y &&
+        prevProps.event.title === nextProps.event.title &&
+        prevProps.event.markerTitle === nextProps.event.markerTitle &&
+        prevProps.event.color === nextProps.event.color &&
+        prevProps.event.category === nextProps.event.category &&
+        prevProps.isSelected === nextProps.isSelected &&
+        prevProps.draggable === nextProps.draggable &&
+        prevProps.isViewed === nextProps.isViewed
+    );
+});

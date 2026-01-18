@@ -209,7 +209,7 @@ export async function getMapConfiguration(mapId, onlyActive = false) {
             eventsQuery.status = "Active";
         }
 
-        const events = await Event.find(eventsQuery).lean();
+        const events = await Event.find(eventsQuery).sort({ order: 1 }).lean();
         const routes = await Route.find({ mapId }).lean();
 
         // Serialize mapConfig (handle _id and blurZones)

@@ -8,11 +8,15 @@ export default function WalkingMan({ position, label = "YOU", offset = { x: -0.3
 
     return (
         <motion.div
-            className="absolute z-[100] pointer-events-none"
+            className="absolute z-[100] pointer-events-none -translate-x-1/2 -translate-y-1/2"
+            style={{
+                left: `${position.x}%`,
+                top: `${position.y}%`,
+            }}
             initial={false}
             animate={{
-                left: `${position.x + (offset.x || 0)}%`,
-                top: `${position.y + (offset.y || 0)}%`
+                x: `${offset.x || 0}%`,
+                y: `${offset.y || 0}%`
             }}
             transition={{
                 type: "spring",
@@ -22,7 +26,7 @@ export default function WalkingMan({ position, label = "YOU", offset = { x: -0.3
                 restDelta: 0.001
             }}
         >
-            <div className="relative -translate-x-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center">
+            <div className="relative w-8 h-8 flex items-center justify-center">
                 <span className="text-sm filter drop-shadow-md">👱🏻‍♂️</span>
                 <div className="absolute -top-0.5 whitespace-nowrap bg-black text-white text-[5px] px-1 rounded font-bold uppercase tracking-widest">
                     {label}

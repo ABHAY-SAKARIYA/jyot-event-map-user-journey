@@ -85,9 +85,9 @@ export default function EventMap({ onEventSelect, SelectedMap, selectMapId, comp
         }
 
         if (event.onClickType === 'action' && event.onClick) {
-            console.log("Triggering custom action:", event.onClick);
             // Action framework can be integrated here
         }
+
 
         setSelectedId(event.id);
 

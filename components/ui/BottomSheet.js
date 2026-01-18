@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Play, Pause, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo, memo } from "react";
 import { saveInteraction } from "@/app/actions/analytics";
 import { useUserParams } from "@/hooks/useUserParams";
 
@@ -165,17 +165,20 @@ export default function BottomSheet({ event, allEvents = [], isOpen, onClose, au
                                         <span className="px-3 py-1 bg-[#FA5429] text-white text-xs font-bold uppercase tracking-wider rounded-full">
                                             {event.group || event.category}
                                         </span>
-                                        <span className="px-3 py-1 bg-black/30 text-white text-xs font-medium uppercase tracking-wider rounded-full backdrop-blur-sm border border-white/20">
+                                        {/* <span className="px-3 py-1 bg-black/30 text-white text-xs font-medium uppercase tracking-wider rounded-full backdrop-blur-sm border border-white/20">
                                             {event.status}
-                                        </span>
+                                        </span> */}
                                     </div>
                                     <h2 className="text-4xl font-serif text-white leading-tight">
                                         {event.title}
                                     </h2>
-                                    <div className="flex items-center gap-2 mt-2 text-white/90 text-sm">
-                                        <MapPin className="w-4 h-4" />
-                                        {event.location}
-                                    </div>
+                                    {
+                                        event.location &&
+                                        <div className="flex items-center gap-2 mt-2 text-white/90 text-sm">
+                                            <MapPin className="w-4 h-4" />
+                                            {event.location}
+                                        </div>
+                                    }
                                 </div>
                             </div>
 
@@ -283,7 +286,7 @@ function formatTime(seconds) {
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 }
 
-function InteractiveWaveform({ isPlaying, progress, onSeek }) {
+const InteractiveWaveform = memo(function InteractiveWaveform({ isPlaying, progress, onSeek }) {
     const bars = 30; // Increased resolution
     const containerRef = useRef(null);
     const [isDragging, setIsDragging] = useState(false);
@@ -317,14 +320,12 @@ function InteractiveWaveform({ isPlaying, progress, onSeek }) {
                         key={i}
                         className={cn(
                             "w-1 rounded-full transition-all duration-150",
-                            isFilled ? "bg-[#FA5429]" : "bg-gray-200 group-hover:bg-gray-300"
+                            isFilled ? "bg-[#FA5429]" : "bg-gray-200 group-hover:bg-gray-300",
+                            isPlaying && "waveform-bar"
                         )}
                         style={{
-                            height: isPlaying
-                                ? `${30 + (Math.sin(i + Date.now() / 1000) * 40)}%` // This won't animate well in React render loop without frame loop, reverted to static or css anim
-                                : `${30 + (Math.sin(i) * 20)}%`,
-                            // Optimized animation:
-                            animation: isPlaying ? `waveform 1s infinite ease-in-out ${i * 0.1}s` : 'none',
+                            height: `${30 + (Math.sin(i) * 20)}%`,
+                            animationDelay: isPlaying ? `${i * 0.1}s` : undefined,
                         }}
                     />
                 );
@@ -334,10 +335,13 @@ function InteractiveWaveform({ isPlaying, progress, onSeek }) {
                     0%, 100% { height: 30%; }
                     50% { height: 80%; }
                 }
+                .waveform-bar {
+                    animation: waveform 1s infinite ease-in-out;
+                }
             `}</style>
         </div>
     )
-}
+});
 
 function DescriptionText({ text }) {
     const [isExpanded, setIsExpanded] = useState(false);
